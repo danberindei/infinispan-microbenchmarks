@@ -23,7 +23,7 @@
             <locking acquire-timeout="30000" concurrency-level="1000" />
             <state-transfer timeout="60000" />
         </distributed-cache>
-        <replicated-cache name="repl-sync" mode="SYNC" remote-timeout="5000" statistics="true">
+        <replicated-cache name="repl-sync" mode="SYNC" remote-timeout="1000" statistics="true">
             <locking acquire-timeout="30000" concurrency-level="1000"/>
             <state-transfer timeout="60000"/>
         </replicated-cache>

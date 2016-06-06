@@ -31,14 +31,19 @@
    </Appenders>
 
    <Loggers>
-      <Logger name="org.infinispan" level="DEBUG"/>
+      <Logger name="org.infinispan" level="TRACE"/>
 
       <!--<Logger name="org.infinispan.remoting" level="TRACE"/>-->
       <Logger name="com.mchange" level="WARN"/>
 
-      <Logger name="org.jgroups" level="TRACE"/>
-      <Logger name="org.jgroups.protocols.pbcast.NAKACK2" level="DEBUG"/>
+      <Logger name="org.jgroups" level="DEBUG"/>
+      <!--<Logger name="org.jgroups.protocols.pbcast.NAKACK2" level="DEBUG"/>-->
       <Logger name="org.jgroups.protocols.pbcast.GMS" level="TRACE"/>
+      <Logger name="org.jgroups.blocks" level="TRACE"/>
+      <Logger name="org.jgroups.protocols.UDP" level="TRACE"/>
+      <!--<Logger name="org.jgroups.protocols.UFC" level="TRACE"/>-->
+      <!--<Logger name="org.jgroups.protocols.MFC" level="TRACE"/>-->
+      <!--<Logger name="org.jgroups.util.CreditMap" level="TRACE"/>-->
 
       <Root level="DEBUG">
          <AppenderRef ref="STDOUT" level="ERROR"/>

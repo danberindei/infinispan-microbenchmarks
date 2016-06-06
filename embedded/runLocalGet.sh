@@ -5,7 +5,7 @@ PREFIX=Local
 TEST="Local.*testGet"
 PARAMS="-wi 40"
 
-COMMON_OPTS=
+COMMON_OPTS="-XX:+UseG1GC"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
 PERFASM_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:PrintAssemblyOptions=intel"
 JITWATCH_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintInlining -XX:+PrintAssembly -XX:PrintAssemblyOptions=intel"

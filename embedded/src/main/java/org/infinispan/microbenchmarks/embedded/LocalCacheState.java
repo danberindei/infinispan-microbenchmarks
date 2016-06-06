@@ -1,4 +1,4 @@
-package org.infinispan.microbenchmarks.local;
+package org.infinispan.microbenchmarks.embedded;
 
 import org.infinispan.Cache;
 import org.infinispan.manager.DefaultCacheManager;

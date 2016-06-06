@@ -3,10 +3,10 @@ set -e
 
 PREFIX=ReplWrite
 TEST="Repl.*testPut"
+PARAMS="-t 200 -wi 40 -r 6 -i 10 -p jgroupsConfig=../config/default-jgroups-udp-sswt.xml -p cacheName=dist-sync"
 #PARAMS="-wi 40 -r 10 -i 5 -p jgroupsConfig=../config/stack-udp-oob500.xml"
-PARAMS="-wi 40 -r 6 -i 10 -p jgroupsConfig=../config/default-jgroups-udp.xml"
 
-COMMON_OPTS="-Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2 -Dlog4j.configurationFile=file:///home/dan/Work/infinispan-microbenchmarks/config/log4j2-trace.xml"
+COMMON_OPTS="-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
 PERFASM_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:PrintAssemblyOptions=intel"
 JITWATCH_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintInlining -XX:+PrintAssembly -XX:PrintAssemblyOptions=intel"
@@ -16,7 +16,10 @@ JFR_OPTIONS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:FlightRe
 #INFINISPAN_VERSION=9.0.0.Alpha1
 INFINISPAN_VERSION=9.0.0-SNAPSHOT
 #JGROUPS_VERSION=3.6.9.Final
-JGROUPS_VERSION=3.6.10-SNAPSHOT
+#JGROUPS_VERSION=3.6.9.SerializationFix
+JGROUPS_VERSION=3.6.9.UfcFix
+#JGROUPS_VERSION=3.6.10-SNAPSHOT
+#JGROUPS_VERSION=4.0.0-SNAPSHOT
 
 mvn clean package -Dinfinispan.version=$INFINISPAN_VERSION -Djgroups.version=$JGROUPS_VERSION
 i=1
@@ -30,6 +33,7 @@ COMMITS=$(git log --pretty=format:"%H %s" -3 | git name-rev --stdin)
 popd
 
 echo Infinispan $INFINISPAN_VERSION > $PREFIX-$i-throughput.log
+echo JGroups $JGROUPS_VERSION >> $PREFIX-$i-throughput.log
 echo Current infinispan working dir commits: >> $PREFIX-$i-throughput.log
 echo $COMMITS >> $PREFIX-$i-throughput.log
 echo >> $PREFIX-$i-throughput.log
@@ -54,3 +58,4 @@ taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$
 #rm $JFR_BASENAME.txt
 
 echo Results are in $PREFIX-$i-throughput.log
+tail -1 $PREFIX-$i-throughput.log

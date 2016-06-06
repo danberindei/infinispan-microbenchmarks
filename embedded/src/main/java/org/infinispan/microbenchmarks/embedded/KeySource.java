@@ -1,4 +1,4 @@
-package org.infinispan.microbenchmarks.local;
+package org.infinispan.microbenchmarks.embedded;
 
 import org.infinispan.Cache;
 import org.openjdk.jmh.annotations.Param;
@@ -41,7 +41,7 @@ public class KeySource {
       ThreadLocalRandom.current().nextBytes(bytes);
       for (int i = 0; i < bytes.length; i++) {
          // Stick to US-ASCII
-         bytes[i] &= 0x7F;
+         bytes[i] = (byte) ((bytes[i] & 0x3F) + 0x20);
       }
       return new String(bytes, Charset.forName("US-ASCII"));
    }
@@ -55,7 +55,7 @@ public class KeySource {
    }
 
    public String nextValue() {
-      return keys[ThreadLocalRandom.current().nextInt(numKeys)];
+      return values[ThreadLocalRandom.current().nextInt(numKeys)];
    }
 
    public int getNumKeys() {

@@ -1,8 +1,6 @@
-package org.infinispan.microbenchmarks.local;
+package org.infinispan.microbenchmarks.embedded;
 
 import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.infra.Blackhole;
 
 public class LocalCacheBenchmark {
