@@ -3,7 +3,7 @@ set -e
 
 PREFIX=ReplWrite
 TEST="Repl.*testPut"
-PARAMS="-t 200 -wi 40 -r 6 -i 10 -p jgroupsConfig=../config/default-jgroups-udp-sswt.xml -p cacheName=dist-sync"
+PARAMS="-t 200 -wi 40 -r 6 -i 10 -p jgroupsConfig=../config/default-jgroups-udp-sswt.xml"
 #PARAMS="-wi 40 -r 10 -i 5 -p jgroupsConfig=../config/stack-udp-oob500.xml"
 
 COMMON_OPTS="-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"

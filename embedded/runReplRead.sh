@@ -3,9 +3,8 @@ set -e
 
 PREFIX=ReplRead
 TEST="Repl.*testGet"
-PARAMS="-t 160 -wi 40 -r 6 -i 10 -p jgroupsConfig=../config/default-jgroups-udp.xml -p cacheName=dist-sync"
-#PARAMS="-wi 40 -r 10 -i 5 -p jgroupsConfig=../config/stack-udp-oob500.xml"
 
+#COMMON_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 COMMON_OPTS="-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
 PERFASM_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:PrintAssemblyOptions=intel"
@@ -14,13 +13,19 @@ JFR_OPTIONS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:FlightRe
 
 #INFINISPAN_VERSION=8.2.3-SNAPSHOT
 #INFINISPAN_VERSION=9.0.0.Alpha1
-#INFINISPAN_VERSION=9.0.0-SNAPSHOT
-#INFINISPAN_VERSION=8.3.0.ER3-redhat-1
-JGROUPS_VERSION=3.6.9.Final
-#JGROUPS_VERSION=3.6.9.SerializationFix
-#JGROUPS_VERSION=3.6.9.UfcFix
+INFINISPAN_VERSION=9.0.0-SNAPSHOT
+#INFINISPAN_VERSION=8.3.0.ER6-redhat-1
+#JGROUPS_VERSION=3.6.9.Final
+JGROUPS_VERSION=3.6.9.UfcFix
 #JGROUPS_VERSION=3.6.10-SNAPSHOT
 #JGROUPS_VERSION=4.0.0-SNAPSHOT
+
+NUM_THREADS=80
+JGROUPS_CONFIG=../config/default-jgroups-udp-sswt.xml
+
+PARAMS="-t $NUM_THREADS -wi 40 -r 6 -i 10 -p jgroupsConfig=$JGROUPS_CONFIG"
+#PARAMS="-wi 40 -r 10 -i 5 -p jgroupsConfig=../config/stack-udp-oob500.xml"
+
 
 function run_java() {
   #taskset -c 4-7 $JAVA_HOME/bin/java "$@"
@@ -70,14 +75,13 @@ echo Results are in $PREFIX-$i-throughput.log
 tail -1 $PREFIX-$i-throughput.log
 }
 
-#INFINISPAN_VERSION=8.3.0.ER2-redhat-1
-#run_build
-#INFINISPAN_VERSION=8.3.0.ER3-redhat-1
-#run_build
-#INFINISPAN_VERSION=8.3.0.ER5-redhat-1
-#run_build
-#INFINISPAN_VERSION=8.3.0.ER6-redhat-1
-#run_build
-
+INFINISPAN_VERSION=8.3.0.ER2-redhat-1
+run_build
+INFINISPAN_VERSION=8.3.0.ER3-redhat-1
+run_build
+INFINISPAN_VERSION=8.3.0.ER5-redhat-1
+run_build
+INFINISPAN_VERSION=8.3.0.ER6-redhat-1
+run_build
 INFINISPAN_VERSION=9.0.0-SNAPSHOT
 run_build

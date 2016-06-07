@@ -3,9 +3,8 @@ set -e
 
 PREFIX=DistWrite
 TEST="PrimaryDist.*testPut"
-PARAMS="-t 80 -wi 40 -r 6 -i 10 -p jgroupsConfig=../config/default-jgroups-udp.xml -p cacheName=dist-sync"
-#PARAMS="-wi 40 -r 10 -i 5 -p jgroupsConfig=../config/stack-udp-oob500.xml"
 
+#COMMON_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 COMMON_OPTS="-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
 PERFASM_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:PrintAssemblyOptions=intel"
@@ -20,6 +19,20 @@ INFINISPAN_VERSION=9.0.0-SNAPSHOT
 JGROUPS_VERSION=3.6.9.UfcFix
 #JGROUPS_VERSION=3.6.10-SNAPSHOT
 #JGROUPS_VERSION=4.0.0-SNAPSHOT
+
+NUM_THREADS=80
+#JGROUPS_CONFIG=../config/default-jgroups-udp-sswt.xml
+
+PARAMS="-t $NUM_THREADS -wi 40 -r 6 -i 10 -p jgroupsConfig=$JGROUPS_CONFIG"
+#PARAMS="-wi 40 -r 10 -i 5 -p jgroupsConfig=../config/stack-udp-oob500.xml"
+
+
+function run_java() {
+  #taskset -c 4-7 $JAVA_HOME/bin/java "$@"
+  $JAVA_HOME/bin/java "$@"
+}
+
+function run_build() {
 
 mvn clean package -Dinfinispan.version=$INFINISPAN_VERSION -Djgroups.version=$JGROUPS_VERSION
 i=1
@@ -39,23 +52,34 @@ echo $COMMITS >> $PREFIX-$i-throughput.log
 echo >> $PREFIX-$i-throughput.log
 
 # straight results
-taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 3 $TEST $PARAMS >>$PREFIX-$i-throughput.log
+run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 3 $TEST $PARAMS >>$PREFIX-$i-throughput.log
+mv gc.log $PREFIX-$i-gc.log
 # perfnorm output
-#taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof perfnorm $TEST $PARAMS >>$PREFIX-$i-perfnorm-gc.log
+run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof perfnorm $TEST $PARAMS >>$PREFIX-$i-perfnorm-gc.log
 # gc output
-#taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof gc $TEST $PARAMS >>$PREFIX-$i-perfnorm-gc.log
+run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof gc $TEST $PARAMS >>$PREFIX-$i-perfnorm-gc.log
 # perfasm output
-#taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $PERFASM_OPTS" -f 1 -prof perfasm:hotThreshold=0.02 $TEST $PARAMS &>$PREFIX-$i-perfasm.log
+run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $PERFASM_OPTS" -f 1 -prof perfasm:hotThreshold=0.02 $TEST $PARAMS &>$PREFIX-$i-perfasm.log
 # jitwatch output
 #taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JITWATCH_OPTS" -f 1 $TEST $PARAMS
 #mv $(ls -t hotspot_pid*.log | head -1) $PREFIX-$i-jitwatch.log
 # flight recorder + flamegraph output
-#taskset -c 4-7 $JAVA_HOME/bin/java -Djmh.jfr.stackdepth=128 -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JFR_OPTIONS" -prof net.nicoulaj.jmh.profilers.FlightRecorderProfiler -f 1 $TEST $PARAMS
-#JFR_BASENAME=$PREFIX-$i-flightrecorder
-#mv $(ls -t hotspot-pid*.jfr | head -1) $JFR_BASENAME.jfr
-#~/Work/jfr-flame-graph/run.sh -f $JFR_BASENAME.jfr -o >(sed -r -e 's/([^a-zA-Z]|^)([a-z])[a-z]+\./\1\2./g' -e 's/(\.[a-z])[a-z]+\./\1./g' >$JFR_BASENAME.txt)
-#~/Work/FlameGraph/flamegraph.pl <$JFR_BASENAME.txt >$JFR_BASENAME.svg
-#rm $JFR_BASENAME.txt
+run_java -Djmh.jfr.stackdepth=128 -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JFR_OPTIONS" -prof net.nicoulaj.jmh.profilers.FlightRecorderProfiler -f 1 $TEST $PARAMS
+JFR_BASENAME=$PREFIX-$i-flightrecorder
+mv $(ls -t hotspot-pid*.jfr | head -1) $JFR_BASENAME.jfr
+~/Work/jfr-flame-graph/run.sh -f $JFR_BASENAME.jfr -o >(sed -r -e 's/([^a-zA-Z]|^)([a-z])[a-z]+\./\1\2./g' -e 's/(\.[a-z])[a-z]+\./\1./g' >$JFR_BASENAME.txt)
+~/Work/FlameGraph/flamegraph.pl <$JFR_BASENAME.txt >$JFR_BASENAME.svg
+rm $JFR_BASENAME.txt
 
 echo Results are in $PREFIX-$i-throughput.log
 tail -1 $PREFIX-$i-throughput.log
+}
+
+JGROUPS_CONFIG=../config/default-jgroups-udp.xml
+run_build
+../config/default-jgroups-udp-simplifiedtqb.xml
+run_build
+../config/default-jgroups-udp-sswt.xml
+run_build
+../config/default-jgroups-udp-no-bundler.xml
+run_build
