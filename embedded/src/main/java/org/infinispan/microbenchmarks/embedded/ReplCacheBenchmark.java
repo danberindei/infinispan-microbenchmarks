@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Fork(jvmArgs = {"-Djava.net.preferIPv4Stack=true"})
 @BenchmarkMode(Mode.SampleTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class ReplCacheBenchmark {
 
    @Threads(400)
