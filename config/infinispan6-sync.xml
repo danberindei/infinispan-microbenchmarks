@@ -5,7 +5,11 @@
       xmlns="urn:infinispan:config:6.4">
 
     <global>
-        <transport/>
+        <transport>
+            <properties>
+                <property name="configurationFile" value="set by benchmark"/>
+            </properties>
+        </transport>
         <globalJmxStatistics enabled="false" allowDuplicateDomains="true"/>
     </global>
 
