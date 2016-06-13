@@ -50,7 +50,7 @@ public class DistCacheState {
                .nodeName("Node" + (char)('A' + i))
                .addProperty(JGroupsTransport.CONFIGURATION_FILE, jgroupsConfig);
          managers[i] = new DefaultCacheManager(holder, true);
-         caches[i] = managers[i].getCache(cacheName).getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
+         caches[i] = managers[i].getCache(cacheName);
          cachesMap.put(managers[i].getAddress(), caches[i]);
       }
 

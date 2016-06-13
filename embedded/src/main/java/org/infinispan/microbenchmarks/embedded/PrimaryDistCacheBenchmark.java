@@ -12,17 +12,15 @@ import java.util.concurrent.TimeUnit;
 
 @Fork(jvmArgs = {"-Djava.net.preferIPv4Stack=true"})
 @BenchmarkMode(Mode.SampleTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class PrimaryDistCacheBenchmark {
 
-   @Threads(400)
    @Benchmark
    public Object testGet(Blackhole blackhole, DistCacheState state, KeySource keySource) {
       String key = keySource.nextKey();
       return state.getPrimaryCache(key).get(key);
    }
 
-   @Threads(400)
    @Benchmark
    public Object testPut(Blackhole blackhole, DistCacheState state, KeySource keySource) {
       String key = keySource.nextKey();

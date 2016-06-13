@@ -15,13 +15,11 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class ReplCacheBenchmark {
 
-   @Threads(400)
    @Benchmark
    public Object testGet(Blackhole blackhole, ReplCacheState state, KeySource keySource) {
       return state.getCache().get(keySource.nextKey());
    }
 
-   @Threads(400)
    @Benchmark
    public Object testPut(Blackhole blackhole, ReplCacheState state, KeySource keySource) {
       return state.getCache().put(keySource.nextKey(), keySource.nextValue());
