@@ -3,8 +3,8 @@ set -e
 
 #PREFIX=PrimaryDistWrite
 #TEST="PrimaryDist.*testPut"
-PREFIX=RandomDistWrite
-TEST="RandomDist.*testPut"
+PREFIX=RandomDistRead
+TEST="RandomDist.*testGet"
 
 NUM_THREADS=10
 WARMUP_SECONDS=40
@@ -57,6 +57,7 @@ echo >> $PREFIX-$i-throughput.log
 
 # straight results
 run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $THROUGHPUT_OPTS" -foe true -f 1 $TEST $PARAMS >>$PREFIX-$i-throughput.log
+mv  infinispan.log $PREFIX-$i-infinispan.log
 mv gc.log $PREFIX-$i-gc.log
 ../../jHiccup/jHiccupLogProcessor -i hiccup.hlog -o hiccup
 cat hiccup hiccup.hgrm >$PREFIX-$i-hiccup.log
@@ -86,16 +87,16 @@ tail -1 $PREFIX-$i-throughput.log
 #INFINISPAN_VERSION=6.4.0.Final-redhat-4
 #PARAMS="$PARAMS -p infinispanConfig=../config/infinispan6-sync.xml" run_build
 
-INFINISPAN_VERSION=8.3.0.ER2-redhat-1
-run_build
-#INFINISPAN_VERSION=8.3.0.ER3-redhat-1
+#INFINISPAN_VERSION=8.3.0.ER2-redhat-1
 #run_build
+#INFINISPAN_VERSION=8.3.0.ER3-redhat-1
+#JGROUPS_VERSION=3.6.7.Final run_build
 #INFINISPAN_VERSION=8.3.0.ER5-redhat-1
 #run_build
 #INFINISPAN_VERSION=8.3.0.ER6-redhat-1
 #run_build
-#INFINISPAN_VERSION=8.3.0-redhat-SNAPSHOT
-#run_build
+INFINISPAN_VERSION=8.3.0-redhat-SNAPSHOT
+run_build
 #INFINISPAN_VERSION=9.0.0-SNAPSHOT
 #run_build
 
