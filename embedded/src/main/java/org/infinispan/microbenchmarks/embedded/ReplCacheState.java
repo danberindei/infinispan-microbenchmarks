@@ -5,6 +5,8 @@ import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.context.Flag;
 import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.microbenchmarks.common.KeySource;
+import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
@@ -15,6 +17,8 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @State(Scope.Benchmark)
 public class ReplCacheState {
@@ -22,14 +26,16 @@ public class ReplCacheState {
 
    @Param("4")
    int clusterSize;
-   @Param("../config/stack-tcp.xml")
+   @Param("missing")
    private String jgroupsConfig;
-   @Param("../config/infinispan-sync.xml")
+   @Param("missing")
    private String infinispanConfig;
    private String cacheName = "repl-sync";
 
    DefaultCacheManager[] managers;
-   Cache cache;
+   Cache[] caches;
+   Map<Address, Cache> cachesMap;
+
 
    @Setup
    public void setup(KeySource keySource) throws IOException {
@@ -37,18 +43,22 @@ public class ReplCacheState {
          log.fatalf(e, "(%s:) Unhandled exception", t);
       });
       managers = new DefaultCacheManager[clusterSize];
+      caches = new Cache[clusterSize];
+      cachesMap = new HashMap<>();
       for (int i = 0; i < clusterSize; i++) {
          ConfigurationBuilderHolder holder = new ParserRegistry().parseFile(infinispanConfig);
          holder.getGlobalConfigurationBuilder().transport()
                .nodeName("Node" + (char)('A' + i))
                .addProperty(JGroupsTransport.CONFIGURATION_FILE, jgroupsConfig);
          managers[i] = new DefaultCacheManager(holder, true);
-         managers[i].getCache(cacheName);
+         caches[i] = managers[i].getCache(cacheName).getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
+         cachesMap.put(managers[i].getAddress(), caches[i]);
       }
 
-      cache = managers[0].getCache(cacheName).getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
-      log.infof("Started cluster with CH %s", cache.getAdvancedCache().getDistributionManager().getConsistentHash());
-      keySource.populateCache(cache);
+//      System.out.println("Running with Infinispan " + Version.getVersion() + ", " + org.jgroups.Version.printDescription());
+      System.out.println("Running with " + org.jgroups.Version.printDescription());
+      log.infof("Started cluster with CH %s", caches[0].getAdvancedCache().getDistributionManager().getConsistentHash());
+      keySource.populateCache((key, value) -> caches[0].put(key, value));
    }
 
    @TearDown
@@ -58,7 +68,11 @@ public class ReplCacheState {
       }
    }
 
-   public Cache getCache() {
-      return cache;
+   public Cache getCache(long threadId) {
+      return caches[(int) (threadId % clusterSize)];
+   }
+
+   public Cache getPrimaryCache(Object key) {
+      return cachesMap.get(caches[0].getAdvancedCache().getDistributionManager().getPrimaryLocation(key));
    }
 }

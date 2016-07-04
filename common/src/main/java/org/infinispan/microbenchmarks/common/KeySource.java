@@ -1,6 +1,5 @@
-package org.infinispan.microbenchmarks.embedded;
+package org.infinispan.microbenchmarks.common;
 
-import org.infinispan.Cache;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
@@ -9,6 +8,7 @@ import org.openjdk.jmh.annotations.TearDown;
 
 import java.nio.charset.Charset;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiConsumer;
 
 @State(Scope.Benchmark)
 public class KeySource {
@@ -41,7 +41,7 @@ public class KeySource {
       ThreadLocalRandom.current().nextBytes(bytes);
       for (int i = 0; i < bytes.length; i++) {
          // Stick to US-ASCII
-         bytes[i] = (byte) ((bytes[i] & 0x3F) + 0x20);
+         bytes[i] = (byte) ((bytes[i] & 0x3F) + 0x40);
       }
       return new String(bytes, Charset.forName("US-ASCII"));
    }
@@ -62,9 +62,9 @@ public class KeySource {
       return numKeys;
    }
 
-   public void populateCache(Cache cache) {
+   public void populateCache(BiConsumer<String, String> writer) {
       for (int i = 0; i < numKeys * initialFillRatio; i++) {
-         cache.put(keys[i], values[i]);
+         writer.accept(keys[i], values[i]);
       }
    }
 }

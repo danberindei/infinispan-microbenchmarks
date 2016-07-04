@@ -1,4 +1,4 @@
-package org.infinispan.microbenchmarks.embedded;
+package org.infinispan.microbenchmarks.remote;
 
 import org.infinispan.microbenchmarks.common.KeySource;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -13,17 +13,15 @@ import java.util.concurrent.TimeUnit;
 @Fork(jvmArgs = {"-Djava.net.preferIPv4Stack=true"})
 @BenchmarkMode(Mode.SampleTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-public class PrimaryDistCacheBenchmark {
+public class HotRodDistCacheBenchmark {
 
    @Benchmark
-   public Object testGet(Blackhole blackhole, DistCacheState state, KeySource keySource) {
-      String key = keySource.nextKey();
-      return state.getPrimaryCache(key).get(key);
+   public Object testGet(Blackhole blackhole, HotRodCacheState state, KeySource keySource) {
+      return state.getDistCache(Thread.currentThread().getId()).get(keySource.nextKey());
    }
 
    @Benchmark
-   public Object testPut(Blackhole blackhole, DistCacheState state, KeySource keySource) {
-      String key = keySource.nextKey();
-      return state.getPrimaryWriteCache(key).put(key, keySource.nextValue());
+   public Object testPut(Blackhole blackhole, HotRodCacheState state, KeySource keySource) {
+      return state.getDistCache(Thread.currentThread().getId()).put(keySource.nextKey(), keySource.nextValue());
    }
 }

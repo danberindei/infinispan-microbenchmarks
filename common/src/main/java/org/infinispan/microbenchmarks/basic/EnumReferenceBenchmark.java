@@ -1,4 +1,4 @@
-package org.infinispan.microbenchmarks.less;
+package org.infinispan.microbenchmarks.basic;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Param;
@@ -6,8 +6,6 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 enum Color {
    RED(1),

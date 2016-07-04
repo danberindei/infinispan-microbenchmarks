@@ -8,10 +8,11 @@ TEST="RandomDist.*testGet"
 
 NUM_THREADS=10
 WARMUP_SECONDS=40
+INFINISPAN_CONFIG=../config/infinispan-synctx.xml
 JGROUPS_CONFIG=../config/default-jgroups-udp-sswt.xml
 
 
-COMMON_OPTS="-XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2 -Dlog4j.configurationFile=file:///home/dan/Work/infinispan-microbenchmarks/config/log4j2-trace.xml"
+COMMON_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006 -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2 -Dlog4j.configurationFile=file:///home/dan/Work/infinispan-microbenchmarks/config/log4j2-trace.xml"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
 PERFASM_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:PrintAssemblyOptions=intel"
 JITWATCH_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintInlining -XX:+PrintAssembly -XX:PrintAssemblyOptions=intel"
@@ -28,7 +29,7 @@ JGROUPS_VERSION=3.6.9.UfcFix
 #JGROUPS_VERSION=3.6.10-SNAPSHOT
 #JGROUPS_VERSION=4.0.0-SNAPSHOT
 
-PARAMS="-t $NUM_THREADS -wi $WARMUP_SECONDS -r 8 -i 5 -p jgroupsConfig=$JGROUPS_CONFIG -p valueSize=2000"
+PARAMS="-t $NUM_THREADS -wi $WARMUP_SECONDS -r 8 -i 5 -p infinispanConfig=$INFINISPAN_CONFIG -p jgroupsConfig=$JGROUPS_CONFIG -p valueSize=2000"
 
 
 function run_java() {
@@ -93,10 +94,12 @@ tail -1 $PREFIX-$i-throughput.log
 #JGROUPS_VERSION=3.6.7.Final run_build
 #INFINISPAN_VERSION=8.3.0.ER5-redhat-1
 #run_build
-#INFINISPAN_VERSION=8.3.0.ER6-redhat-1
-#run_build
+#JGROUPS_VERSION=3.6.4.Final-compat-369
+JGROUPS_VERSION=3.6.10.Final-revert-receive-fc
 INFINISPAN_VERSION=8.3.0-redhat-SNAPSHOT
 run_build
+#INFINISPAN_VERSION=8.3.0-redhat-SNAPSHOT
+#run_build
 #INFINISPAN_VERSION=9.0.0-SNAPSHOT
 #run_build
 

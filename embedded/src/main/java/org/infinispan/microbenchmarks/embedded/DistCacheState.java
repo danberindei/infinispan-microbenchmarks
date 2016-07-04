@@ -5,6 +5,7 @@ import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.context.Flag;
 import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.microbenchmarks.common.KeySource;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 import org.infinispan.util.logging.Log;
@@ -25,15 +26,17 @@ public class DistCacheState {
 
    @Param("4")
    int clusterSize;
-   @Param("../config/stack-tcp.xml")
+   @Param("missing")
    private String jgroupsConfig;
-   @Param("../config/infinispan-sync.xml")
+   @Param("missing")
    private String infinispanConfig;
    private String cacheName = "dist-sync";
 
    DefaultCacheManager[] managers;
    Cache[] caches;
+   Cache[] writeCaches;
    Map<Address, Cache> cachesMap;
+   Map<Address, Cache> writeCachesMap;
 
 
    @Setup
@@ -43,19 +46,28 @@ public class DistCacheState {
       });
       managers = new DefaultCacheManager[clusterSize];
       caches = new Cache[clusterSize];
+      writeCaches = new Cache[clusterSize];
       cachesMap = new HashMap<>();
+      writeCachesMap = new HashMap<>();
       for (int i = 0; i < clusterSize; i++) {
          ConfigurationBuilderHolder holder = new ParserRegistry().parseFile(infinispanConfig);
+         String nodeName = "Node" + (char) ('A' + i);
          holder.getGlobalConfigurationBuilder().transport()
-               .nodeName("Node" + (char)('A' + i))
+               .nodeName(nodeName)
                .addProperty(JGroupsTransport.CONFIGURATION_FILE, jgroupsConfig);
+         log.infof("Starting node %s", nodeName);
          managers[i] = new DefaultCacheManager(holder, true);
          caches[i] = managers[i].getCache(cacheName);
+         writeCaches[i] = caches[i].getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
          cachesMap.put(managers[i].getAddress(), caches[i]);
+         writeCachesMap.put(managers[i].getAddress(), writeCaches[i]);
+         log.infof("Started node %s", managers[i].getAddress());
       }
 
+//      System.out.println("Running with Infinispan " + Version.getVersion() + ", " + org.jgroups.Version.printDescription());
+      System.out.println("Running with " + org.jgroups.Version.printDescription());
       log.infof("Started cluster with CH %s", caches[0].getAdvancedCache().getDistributionManager().getConsistentHash());
-      keySource.populateCache(caches[0]);
+      keySource.populateCache((key, value) -> caches[0].put(key, value));
    }
 
    @TearDown
@@ -71,5 +83,13 @@ public class DistCacheState {
 
    public Cache getPrimaryCache(Object key) {
       return cachesMap.get(caches[0].getAdvancedCache().getDistributionManager().getPrimaryLocation(key));
+   }
+
+   public Cache getWriteCache(long threadId) {
+      return writeCaches[(int) (threadId % clusterSize)];
+   }
+
+   public Cache getPrimaryWriteCache(Object key) {
+      return writeCachesMap.get(caches[0].getAdvancedCache().getDistributionManager().getPrimaryLocation(key));
    }
 }

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-PREFIX=RandomDistWrite
-TEST="RandomDist.*testPut"
+PREFIX=HRDistWrite
+TEST="HotRodRepl.*testPut"
 
 BENCHMARK_MODE=thrpt
 BENCHMARK_TIME_UNITS=s
@@ -40,7 +40,7 @@ function log_version() {
 }
 
 function run_build() {
-PARAMS="-t $NUM_THREADS -wi $WARMUP_SECONDS -r 6 -i 5 -bm $BENCHMARK_MODE -tu $BENCHMARK_TIME_UNITS -p infinispanConfig=$INFINISPAN_CONFIG -p jgroupsConfig=$JGROUPS_CONFIG"
+PARAMS="-t $NUM_THREADS -w 5 -wi $((WARMUP_SECONDS / 5)) -r 5 -i 6 -bm $BENCHMARK_MODE -tu $BENCHMARK_TIME_UNITS -p infinispanConfig=$INFINISPAN_CONFIG -p jgroupsConfig=$JGROUPS_CONFIG"
 
 if [[ "$INFINISPAN_COMMIT" != "" ]]; then
   pushd $INFINISPAN_HOME
@@ -90,55 +90,18 @@ log_version >> $PREFIX-$i.log
 }
 
 INFINISPAN_HOME=/home/dan/Work/jdg
-#INFINISPAN_VERSION=9.0.0-SNAPSHOT
-#JGROUPS_VERSION=3.6.9.Final
 
-#JGROUPS_CONFIG=../config/default-jgroups-udp-sswt.xml
-#for tag in $(git -C $INFINISPAN_HOME tag | grep JDG_7.0.0.ER)
-#do
-#  git -C $INFINISPAN_HOME checkout $tag
-#  INFINISPAN_VERSION=8.3.0${tag/JDG_7.0.0/}-redhat-1
-#  JGROUPS_VERSION=$(cat $INFINISPAN_HOME/bom/pom.xml | perl -ne 'if (/version.jgroups>(.*)<\/version.jgroups/) { print "$1\n" }')
-#  run_build || echo Failed to run test for $tag
-#done
-
-#for tag in $(git -C $INFINISPAN_HOME tag | grep "^9")
-#do
-#  git -C $INFINISPAN_HOME checkout $tag
-#  INFINISPAN_VERSION=$tag
-#  JGROUPS_VERSION=$(cat $INFINISPAN_HOME/bom/pom.xml | perl -ne 'if (/version.jgroups>(.*)<\/version.jgroups/) { print "$1\n" }')
-#  run_build || echo Failed to run test for $tag
-#done
-
-#INFINISPAN_VERSION=6.4.0.Final-redhat-4
-#JGROUPS_VERSION=3.6.4.Final
-#INFINISPAN_CONFIG=../config/infinispan6-sync.xml run_build
-
-#INFINISPAN_VERSION=8.3.0.ER2-redhat-1
-#run_build
-#INFINISPAN_VERSION=8.3.0.ER3-redhat-1
-#run_build
-#INFINISPAN_VERSION=8.3.0.ER5-redhat-1
-#run_build
-#INFINISPAN_VERSION=8.3.0.ER6-redhat-1
-#run_build
-#INFINISPAN_VERSION=8.3.0-redhat-SNAPSHOT
-#run_build
-#INFINISPAN_VERSION=9.0.0-SNAPSHOT
-#run_build
-
-#INFINISPAN_VERSION=8.3.0-redhat-SNAPSHOT
-#JGROUPS_CONFIG=../config/default-jgroups-udp.xml
-#run_build
-#../config/default-jgroups-udp-simplifiedtqb.xml
-#run_build
-#../config/default-jgroups-udp-sswt.xml
-#run_build
-#../config/default-jgroups-udp-no-bundler.xml
-#run_build
-
-INFINISPAN_VERSION=8.3.0.ER6-redhat-1
-JGROUPS_VERSION=3.6.9.Final
+INFINISPAN_VERSION=8.3.0.ER9-redhat-1
+JGROUPS_VERSION=3.6.10.Final-redhat-1
+INFINISPAN_CONFIG=../config/infinispan-synctx.xml
 run_build
-JGROUPS_VERSION=3.6.4.Final-compat-369
+
+#INFINISPAN_VERSION=8.3.0.ER8-redhat-1
+#JGROUPS_VERSION=3.6.10.Final-redhat-1
+#INFINISPAN_CONFIG=../config/infinispan-synctx.xml
+#run_build
+
+INFINISPAN_VERSION=6.4.0.Final-redhat-4
+JGROUPS_VERSION=3.6.4.Final
+INFINISPAN_CONFIG=../config/infinispan6-sync.xml
 run_build

@@ -1,4 +1,4 @@
-package org.infinispan.microbenchmarks.less;
+package org.infinispan.microbenchmarks.basic;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Scope;
