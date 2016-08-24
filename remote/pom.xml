@@ -8,17 +8,17 @@
    </parent>
    <modelVersion>4.0.0</modelVersion>
 
-   <artifactId>infinispan-microbenchmarks-embedded</artifactId>
+   <artifactId>infinispan-microbenchmarks-remote</artifactId>
    <packaging>jar</packaging>
 
-   <name>Infinispan Embedded Micro-benchmarks</name>
+   <name>Infinispan Remote Micro-benchmarks</name>
 
    <prerequisites>
       <maven>3.0</maven>
    </prerequisites>
 
    <properties>
-      <infinispan.version>9.0.0-SNAPSHOT</infinispan.version>
+      <infinispan.version>8.3.0.ER9-redhat-1</infinispan.version>
       <jgroups.version>3.6.10.Final</jgroups.version>
    </properties>
 
@@ -39,6 +39,45 @@
                <artifactId>jgroups</artifactId>
             </exclusion>
          </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.infinispan</groupId>
+         <artifactId>infinispan-server-hotrod</artifactId>
+         <version>${infinispan.version}</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jgroups</groupId>
+               <artifactId>jgroups</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.infinispan</groupId>
+         <artifactId>infinispan-client-hotrod</artifactId>
+         <version>${infinispan.version}</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jgroups</groupId>
+               <artifactId>jgroups</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>org.infinispan</groupId>
+         <artifactId>infinispan-server-memcached</artifactId>
+         <version>${infinispan.version}</version>
+         <exclusions>
+            <exclusion>
+               <groupId>org.jgroups</groupId>
+               <artifactId>jgroups</artifactId>
+            </exclusion>
+         </exclusions>
+      </dependency>
+      <dependency>
+         <groupId>spy</groupId>
+         <artifactId>memcached</artifactId>
+         <version>2.5</version>
+         <scope>test</scope>
       </dependency>
       <dependency>
          <groupId>org.jgroups</groupId>
@@ -74,6 +113,11 @@
          <groupId>org.jboss.narayana.jta</groupId>
          <artifactId>narayana-jta</artifactId>
          <version>5.2.16.Final-redhat-1</version>
+      </dependency>
+      <dependency>
+         <groupId>spy</groupId>
+         <artifactId>memcached</artifactId>
+         <version>2.5</version>
       </dependency>
    </dependencies>
 </project>

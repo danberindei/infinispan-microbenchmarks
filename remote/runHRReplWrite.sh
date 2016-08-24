@@ -15,6 +15,7 @@ JGROUPS_CONFIG=../config/default-jgroups-udp-sswt.xml
 
 
 COMMON_OPTS="-XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
+COMMON_OPTS="$COMMON_OPTS -Dlog4j.configurationFile=file:///home/dan/Work/infinispan-microbenchmarks/config/log4j2.xml"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
 THROUGHPUT_OPTS="-javaagent:/home/dan/Work/jHiccup/jHiccup.jar=\"-d $WARMUP_SECONDS -i 1000 -l hiccup.hlog\" -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime"
 PERFASM_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:PrintAssemblyOptions=intel"

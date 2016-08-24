@@ -23,17 +23,20 @@ public class KeySource {
 
    String[] keys;
    String[] values;
+   byte[][] byteArrayValues;
 
    @Setup
    public void setup() {
       keys = new String[numKeys];
       values = new String[numKeys];
+      byteArrayValues = new byte[numKeys][];
 
       byte[] keyBytes = new byte[keySize];
       byte[] valueBytes = new byte[valueSize];
       for (int i = 0; i < numKeys; i++) {
          keys[i] = randomString(keyBytes);
          values[i] = randomString(valueBytes);
+         byteArrayValues[i] = values[i].getBytes();
       }
    }
 
@@ -56,6 +59,10 @@ public class KeySource {
 
    public String nextValue() {
       return values[ThreadLocalRandom.current().nextInt(numKeys)];
+   }
+
+   public byte[] nextByteArrayValue() {
+      return byteArrayValues[ThreadLocalRandom.current().nextInt(numKeys)];
    }
 
    public int getNumKeys() {
