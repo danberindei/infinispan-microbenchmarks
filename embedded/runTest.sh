@@ -3,7 +3,7 @@ set -e
 
 BENCHMARK_MODE=thrpt
 BENCHMARK_TIME_UNITS=s
-NUM_THREADS=40
+NUM_THREADS=80
 KEY_SIZE=20
 VALUE_SIZE=2000
 WARMUP_SECONDS=40
@@ -12,20 +12,24 @@ PREFIX=LocalRead ; TEST="Local.*testGet"
 #PREFIX=LocalWrite ; TEST="Local.*testPut"
 #PREFIX=ReplRead ; TEST="Repl.*testGet"
 #PREFIX=ReplWrite ; TEST="Repl.*testPut"
-#PREFIX=DistRead ; TEST="Dist.*testGet"
-#PREFIX=DistWrite ; TEST="Dist.*testPut"
+#PREFIX=PrimaryDistRead ; TEST="PrimaryDist.*testGet"
+PREFIX=PrimaryDistWrite ; TEST="RandomDistC.*testPut"
 
 #LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=1; LOG_GC=1; LOG_JITWATCH=1; LOG_PERFASM=1; LOG_JFR=1
-LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=1; LOG_JFR=0
+LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=1; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=1; LOG_JFR=1
+#LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=0; LOG_JFR=1
 
 INFINISPAN_HOME=$HOME/Work/infinispan
 
 #INFINISPAN_COMMITS="$(git -C $INFINISPAN_HOME rev-list master..ISPN-5467_perf_experiments) master"
 #INFINISPAN_COMMITS="$(git -C $INFINISPAN_HOME rev-list master..ISPN-5467_perf_experiments)"
-INFINISPAN_COMMITS="ISPN-5467_CompletableFuture-like_API ISPN-5467_perf_experiments_1 ISPN-5467_perf_experiments_2  ISPN-5467_perf_experiments_3 ISPN-5467_perf_experiments_4 master"
-#INFINISPAN_COMMITS="ISPN-5467_perf_experiments_4"
+#INFINISPAN_COMMITS="ISPN-5467_CompletableFuture-like_API ISPN-5467_perf_experiments_1 ISPN-5467_perf_experiments_2  ISPN-5467_perf_experiments_3 ISPN-5467_perf_experiments_4 master"
+INFINISPAN_COMMITS="ISPN-6805_CacheMgmtInterceptor ISPN-6805_CacheMgmtInterceptor~1 master"
 
 #JGROUPS_VERSION="3.6.10.Final"
+
+INFINISPAN_CONFIG=../config/infinispan-sync.xml
+JGROUPS_CONFIG=../config/default-jgroups-udp.xml
 
 COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 COMMON_OPTS="$COMMON_OPTS -Dlog4j.configurationFile=file:///home/dan/Work/infinispan-microbenchmarks/config/log4j2.xml"
@@ -41,8 +45,8 @@ ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRec
 cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
 
 function run_java() {
-#  $JAVA_HOME/bin/java "$@"
-  taskset -c 4-7 $JAVA_HOME/bin/java "$@"
+  $JAVA_HOME/bin/java "$@"
+#  taskset -c 4-7 $JAVA_HOME/bin/java "$@"
 }
 
 function log_version() {
