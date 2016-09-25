@@ -13,7 +13,7 @@ PREFIX=LocalRead ; TEST="Local.*testGet"
 #PREFIX=ReplRead ; TEST="Repl.*testGet"
 #PREFIX=ReplWrite ; TEST="Repl.*testPut"
 #PREFIX=PrimaryDistRead ; TEST="PrimaryDist.*testGet"
-PREFIX=PrimaryDistWrite ; TEST="RandomDistC.*testPut"
+#PREFIX=PrimaryDistWrite ; TEST="RandomDistC.*testPut"
 
 #LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=1; LOG_GC=1; LOG_JITWATCH=1; LOG_PERFASM=1; LOG_JFR=1
 LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=1; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=1; LOG_JFR=1
