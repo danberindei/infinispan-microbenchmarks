@@ -50,16 +50,16 @@
          <artifactId>jboss-transaction-api_1.1_spec</artifactId>
          <version>1.0.1.Final</version>
       </dependency>
-      <dependency>
-         <groupId>net.ju-n.jmh-utils</groupId>
-         <artifactId>jmh-profiler-solaris-studio</artifactId>
-         <version>1.0.0-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-         <groupId>net.ju-n.jmh-utils</groupId>
-         <artifactId>jmh-profiler-flight-recorder</artifactId>
-         <version>1.0.0-SNAPSHOT</version>
-      </dependency>
+      <!--<dependency>-->
+         <!--<groupId>net.ju-n.jmh-utils</groupId>-->
+         <!--<artifactId>jmh-profiler-solaris-studio</artifactId>-->
+         <!--<version>1.0.0-SNAPSHOT</version>-->
+      <!--</dependency>-->
+      <!--<dependency>-->
+         <!--<groupId>net.ju-n.jmh-utils</groupId>-->
+         <!--<artifactId>jmh-profiler-flight-recorder</artifactId>-->
+         <!--<version>1.0.0-SNAPSHOT</version>-->
+      <!--</dependency>-->
       <dependency>
          <groupId>org.apache.logging.log4j</groupId>
          <artifactId>log4j-core</artifactId>
