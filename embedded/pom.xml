@@ -18,8 +18,8 @@
    </prerequisites>
 
    <properties>
-      <infinispan.version>9.0.0-SNAPSHOT</infinispan.version>
-      <jgroups.version>3.6.10.Final</jgroups.version>
+      <version.infinispan>9.0.0-SNAPSHOT</version.infinispan>
+      <version.jgroups>4.0.0.Beta3</version.jgroups>
    </properties>
 
    <dependencies>
@@ -32,7 +32,7 @@
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-core</artifactId>
-         <version>${infinispan.version}</version>
+         <version>${version.infinispan}</version>
          <exclusions>
             <exclusion>
                <groupId>org.jgroups</groupId>
@@ -43,7 +43,7 @@
       <dependency>
          <groupId>org.jgroups</groupId>
          <artifactId>jgroups</artifactId>
-         <version>${jgroups.version}</version>
+         <version>${version.jgroups}</version>
       </dependency>
       <dependency>
          <groupId>org.jboss.spec.javax.transaction</groupId>
