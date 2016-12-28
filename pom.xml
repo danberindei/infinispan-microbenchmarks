@@ -11,7 +11,7 @@
 
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <jmh.version>1.14.1</jmh.version>
+      <jmh.version>1.18-SNAPSHOT</jmh.version>
       <javac.target>1.8</javac.target>
       <uberjar.name>benchmarks</uberjar.name>
    </properties>
