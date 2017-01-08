@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+set -o pipefail
+set -o errtrace
 
 BENCHMARK_MODE=thrpt
 BENCHMARK_TIME_UNITS=s
@@ -15,27 +17,29 @@ WARMUP_SECONDS=40
 #PREFIX=LocalWrite ; TEST="Local.*testPut"
 #PREFIX=ReplRead ; TEST="Repl.*testGet"
 #PREFIX=ReplWrite ; TEST="Repl.*testPut"
-PREFIX=ETxReplRead ; TEST="Repl.*testTxGet"
+#PREFIX=ETxReplRead ; TEST="Repl.*testTxGet"
+#PREFIX=Repl ; TEST="Repl.*"
 #PREFIX=PrimaryDistRead ; TEST="PrimaryDist.*testGet"
 #PREFIX=PrimaryDistWrite ; TEST="PrimaryDistC.*testPut"
-#PREFIX=RandomDistRead ; TEST="RandomDist.*testGet"
+PREFIX=RandomDistRead ; TEST="RandomDist.*testGet"
 #PREFIX=RandomDistWrite ; TEST="RandomDistC.*testPut"
 #PREFIX=MH3 ; TEST="MurmurHash3Benchmark.testHash"
 
-LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=1; LOG_JFR=1
+#LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=0; LOG_JFR=1
 #LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=1; LOG_PERFASM=0; LOG_JFR=0
 #LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=1; LOG_JFR=0
+LOG_MAIN=1; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=1; LOG_JFR=0
 
-#INFINISPAN_PREBUILT_VERSIONS=""
-INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1"
+INFINISPAN_PREBUILT_VERSIONS=""
+#INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1"
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
 #INFINISPAN_HOME=$WORK_DIR/jdg
 
-INFINISPAN_COMMITS=""
-#INFINISPAN_COMMITS="t_async_api_change_experiments"
-#INFINISPAN_COMMITS="jdg-7.1.x"
+#INFINISPAN_COMMITS="t_async_api_change_experiments_5"
+INFINISPAN_COMMITS="9.0.0.Beta1 master t_async_api_change_experiments t_async_api_change_experiments_2 t_async_api_change_experiments_3 t_async_api_change_experiments_4 t_async_api_change_experiments_5 t_async_api_change_experiments_6"
+#INFINISPAN_COMMITS="JDG_7.0.0.GA JDG_7.1.0.ER1 jdg-7.1.x"
 
 FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="3.6.10.Final"
@@ -56,7 +60,7 @@ JFR_PARENT_OPTIONS="-Djmh.jfr.stackdepth=128"
 ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/allocation_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 #ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/exception_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 
-cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
+#cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
 
 function run_java() {
 #  $JAVA_HOME/bin/java "$@"
@@ -70,6 +74,13 @@ function log_version() {
   echo Current infinispan working dir commits:
   echo $LAST_COMMITS
   echo
+}
+
+function exit_on_error() {
+  if [[ -n $? ]] ; then
+    echo "Exiting because of an error in $1"
+    exit 1
+  fi
 }
 
 function run_build() {
@@ -134,10 +145,15 @@ if [ "$LOG_JFR" == "1" ] ; then
    #run_java $JFR_PARENT_OPTIONS -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JFR_OPTIONS" -prof net.nicoulaj.jmh.profilers.FlightRecorderProfiler -f 1 $TEST $PARAMS
    run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $ALT_JFR_OPTIONS" -f 1 $TEST $PARAMS
    JFR_BASENAME=$BASENAME-flightrecorder
-   mv $(ls -t hotspot-pid*.jfr | head -1) $JFR_BASENAME.jfr
-   ~/Work/jfr-flame-graph/run.sh -f $JFR_BASENAME.jfr -o >(sed -r -e 's/([^a-zA-Z]|^)([a-z])[a-z]+\./\1\2./g' -e 's/(\.[a-z])[a-z]+\./\1./g' >$JFR_BASENAME.stacks)
-   ~/Work/FlameGraph/flamegraph.pl --width 1900 --colors hot --cp <$JFR_BASENAME.stacks >$JFR_BASENAME.svg
-   rm $JFR_BASENAME.stacks
+   I=0
+   for f in $(ls  hotspot-pid*.jfr) ; do
+      I=$((I + 1))
+      mv $f $JFR_BASENAME$I.jfr
+      ~/Work/jfr-flame-graph/run.sh -f $JFR_BASENAME$I.jfr -o >(sed -r -e 's/([^a-zA-Z]|^)([a-z])[a-z]+\./\1\2./g' -e 's/(\.[a-z])[a-z]+\./\1./g' >$JFR_BASENAME$I.stacks)
+      ~/Work/FlameGraph/flamegraph.pl --width 1900 --colors hot --cp <$JFR_BASENAME$I.stacks >$JFR_BASENAME$I.svg
+      rm $JFR_BASENAME$I.stacks
+   done
+   I=
 fi
 
 echo Results are in $BASENAME.log
