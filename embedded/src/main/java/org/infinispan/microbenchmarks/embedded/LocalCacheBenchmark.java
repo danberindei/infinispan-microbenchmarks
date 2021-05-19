@@ -1,6 +1,5 @@
 package org.infinispan.microbenchmarks.embedded;
 
-import org.infinispan.microbenchmarks.common.KeySource;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -15,11 +14,11 @@ public class LocalCacheBenchmark {
 
    @Benchmark
    public Object testGet(Blackhole blackhole, LocalCacheState state, KeySource keySource) {
-      return state.getCache().get(keySource.nextKey());
+      return state.getCache().get(keySource.nextByteArrayKey());
    }
 
    @Benchmark
    public Object testPut(Blackhole blackhole, LocalCacheState state, KeySource keySource) {
-      return state.getCache().put(keySource.nextKey(), keySource.nextValue());
+      return state.getCache().put(keySource.nextByteArrayKey(), keySource.nextByteArrayValue());
    }
 }

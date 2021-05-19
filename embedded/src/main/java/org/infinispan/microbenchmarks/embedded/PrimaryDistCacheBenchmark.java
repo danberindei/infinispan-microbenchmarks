@@ -1,6 +1,5 @@
 package org.infinispan.microbenchmarks.embedded;
 
-import org.infinispan.microbenchmarks.common.KeySource;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;

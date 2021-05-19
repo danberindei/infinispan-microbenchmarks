@@ -2,14 +2,7 @@ package org.infinispan.microbenchmarks.embedded;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-
 import org.infinispan.Cache;
-import org.infinispan.microbenchmarks.common.KeySource;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -66,21 +59,24 @@ public class ReplCacheBenchmark {
       // -p clusterSize=4 -p infinispanConfig=../config/infinispan-sync.xml -p initialFillRatio=0.5
       // -p jgroupsConfig=default-configs/default-jgroups-tcp.xml -p keySize=20 -p numKeys=1000 -p valueSize=200
       Options opt = new OptionsBuilder()
-            .include("ReplCacheBenchmark.testTxGet")
+            .include("ReplCacheBenchmark.testTxPut")
             .forks(0)
             .mode(Mode.Throughput)
+            .timeUnit(TimeUnit.SECONDS)
             .warmupIterations(5)
-            .warmupTime(TimeValue.seconds(1))
-            .measurementIterations(5)
+            .warmupTime(TimeValue.seconds(6))
+            .measurementIterations(1)
             .measurementTime(TimeValue.seconds(6))
+            .threads(40)
             .param("clusterSize", "4")
-            .param("infinispanConfig", "../config/infinispan-sync.xml")
-            .param("initialFillRatio", "0.5")
-            .param("jgroupsConfig", "default-configs/default-jgroups-tcp.xml")
-            .param("keySize", "20")
-            .param("numKeys", "1000")
-            .param("valueSize", "200")
+            .param("infinispanConfig", "../config/infinispan-synctx.xml")
+            .param("initialFillRatio", "1.0")
+            .param("jgroupsConfig", "default-configs/default-jgroups-udp.xml")
+            .param("keySize", "50")
+            .param("numKeys", "5000")
+            .param("valueSize", "10000")
             .build();
 
       new Runner(opt).run();
-   }}
+   }
+}

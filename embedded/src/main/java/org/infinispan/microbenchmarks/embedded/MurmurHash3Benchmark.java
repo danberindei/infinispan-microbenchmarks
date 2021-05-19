@@ -3,7 +3,6 @@ package org.infinispan.microbenchmarks.embedded;
 import java.util.concurrent.TimeUnit;
 
 import org.infinispan.commons.hash.MurmurHash3;
-import org.infinispan.microbenchmarks.common.KeySource;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;

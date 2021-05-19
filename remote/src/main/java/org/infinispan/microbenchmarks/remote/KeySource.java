@@ -1,4 +1,8 @@
-package org.infinispan.microbenchmarks.common;
+package org.infinispan.microbenchmarks.remote;
+
+import java.nio.charset.Charset;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiConsumer;
 
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
@@ -6,19 +10,15 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
-import java.nio.charset.Charset;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.BiConsumer;
-
 @State(Scope.Benchmark)
 public class KeySource {
    @Param("1000")
    int numKeys;
    @Param("20")
    int keySize;
-   @Param("200")
+   @Param("1000")
    int valueSize;
-   @Param("0.5")
+   @Param("1.0")
    float initialFillRatio;
 
    String[] keys;

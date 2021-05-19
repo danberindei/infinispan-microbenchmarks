@@ -4,78 +4,45 @@ set -o pipefail
 set -o errtrace
 set -o functrace
 
-BENCHMARK_MODE=thrpt
-BENCHMARK_TIME_UNITS=s
-#BENCHMARK_MODE=sample
-#BENCHMARK_TIME_UNITS=ns
-CLUSTER_SIZE=8
-NUM_THREADS=100
-KEY_SIZE=20
-VALUE_SIZE=1000
-NUM_KEYS=1000
-FILL_RATIO=1.0
-WARMUP_SECONDS=60
-TEST_SECONDS=45
+#BENCHMARK_MODE=thrpt
+#BENCHMARK_TIME_UNITS=s
+BENCHMARK_MODE=sample
+BENCHMARK_TIME_UNITS=us
+NUM_SEGMENTS=500
+NUM_OWNERS=3
+NUM_NODES=3
+NUM_THREADS=1
+WARMUP_SECONDS=10
+TEST_SECONDS=10
 
-#PREFIX=All ; TEST=".*CacheBenchmark.*"
-#PREFIX=NonTxRead ; TEST="(Local|Repl|RandomDist).*testGet"
-#PREFIX=ETxRead ; TEST="(Repl|RandomDist).*testTxGet"
-#PREFIX=LocalRead ; TEST="Local.*testGet"
-PREFIX=LocalWrite ; TEST="Local.*testPut"
-#PREFIX=NonTxReplRead ; TEST="Repl.*testGet"
-#PREFIX=ReplWrite ; TEST="Repl.*testPut"
-#PREFIX=ETxReplRead ; TEST="Repl.*testTxGet"
-#PREFIX=ETxReplWrite ; TEST="Repl.*testTxPut"
-#PREFIX=Repl ; TEST="Repl.*"
-#PREFIX=PrimaryDistRead ; TEST="PrimaryDist.*testGet"
-#PREFIX=PrimaryDistWrite ; TEST="PrimaryDistC.*testPut"
-#PREFIX=RandomDistRead ; TEST="RandomDist.*testGet"
-#PREFIX=RandomDistWrite ; TEST="RandomDistC.*testPut"
-#PREFIX=RandomDistTxRead ; TEST="RandomDist.*testTxGet"
-#PREFIX=MH3 ; TEST="MurmurHash3Benchmark.testHash"
+PREFIX=SCHF; TEST="SyncConsistentHashFactoryBenchmark"
 
 LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=0; LOG_JFR=0
-LOG_MAIN=1
+#LOG_MAIN=1
 #LOG_HICCUP=1
 #LOG_PERFNORM=1
 #LOG_GC=1
 #LOG_JITWATCH=1
 LOG_PERFASM=1
-LOG_JFR=1
+#LOG_JFR=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
 #INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1"
-#INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1 8.4.0.ER5-redhat-1"
-#INFINISPAN_PREBUILT_VERSIONS="6.4.2.DR1-redhat-1 6.4.1.Final-redhat-1"
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
 #INFINISPAN_HOME=$WORK_DIR/jdg
 
-INFINISPAN_COMMITS=""
-INFINISPAN_COMMITS="ISPN-wrapped_bytes_hash"
-#INFINISPAN_COMMITS="master ISPN-8410_off-heap_crash ISPN-wrapped_bytes_hash ISPN-off-heap-disabled"
-#INFINISPAN_COMMITS="JDG_7.0.0.GA JDG_7.1.0.ER1 jdg-7.1.x"
-#INFINISPAN_COMMITS="JDG-685/JDG-670/no-bundler/replicated_reads"
+INFINISPAN_COMMITS="ISPN-11679_SyncConsistentHashFactory"
 
 FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="3.6.10.Final"
 
-INFINISPAN_CONFIG="../config/infinispan-sync9.xml"
-#INFINISPAN_CONFIG="../config/infinispan-synctx.xml"
-#INFINISPAN_CONFIG="../config/infinispan6-synctx.xml"
-
-JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
-#JGROUPS_CONFIG="../config/jgroups-tcp-ufc.xml"
-#JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
-#JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
-#JGROUPS_CONFIG="../config/jdg662_modified_udp.xml"
-
-COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
+COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+PrintGCDetails -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 COMMON_OPTS="$COMMON_OPTS -Dlog4j.configurationFile=file:///$WORK_DIR/infinispan-microbenchmarks/config/log4j2.xml"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
-#THROUGHPUT_OPTS="-javaagent:/$WORK_DIR/jHiccup/jHiccup.jar=\"-d $WARMUP_SECONDS -i 1000 -l hiccup.hlog\" -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime"
-THROUGHPUT_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime"
+#THROUGHPUT_OPTS="-javaagent:/$WORK_DIR/jHiccup/jHiccup.jar=\"-d $WARMUP_SECONDS -i 1000 -l hiccup.hlog\" -XX:+PrintGCDetails"
+THROUGHPUT_OPTS="-XX:+PrintGCDetails"
 PERFASM_OPTS="-XX:PrintAssemblyOptions=intel"
 JITWATCH_OPTS="-XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintInlining -XX:+PrintAssembly -XX:PrintAssemblyOptions=intel"
 JFR_OPTIONS=""
@@ -83,7 +50,7 @@ JFR_PARENT_OPTIONS="-Djmh.jfr.stackdepth=128"
 ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/allocation_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 #ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/exception_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 
-cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
+cpupower --cpu all frequency-info | grep "current policy" | grep "and 2.50 GHz" || exit 9
 
 function run_java() {
 #  $JAVA_HOME/bin/java "$@"
@@ -107,7 +74,7 @@ function exit_on_error() {
 }
 
 function run_build() {
-PARAMS="-t $NUM_THREADS -w 5 -wi $((WARMUP_SECONDS / 5)) -r 5 -i $((TEST_SECONDS / 5)) -bm $BENCHMARK_MODE -tu $BENCHMARK_TIME_UNITS -p infinispanConfig=$INFINISPAN_CONFIG -p jgroupsConfig=$JGROUPS_CONFIG -p clusterSize=$CLUSTER_SIZE -p initialFillRadio=$FILL_RATIO -p numKeys=${NUM_KEYS} -p keySize=${KEY_SIZE} -p valueSize=${VALUE_SIZE}"
+PARAMS="-t $NUM_THREADS -w 5 -wi $((WARMUP_SECONDS / 5)) -r 5 -i $((TEST_SECONDS / 5)) -bm $BENCHMARK_MODE -tu $BENCHMARK_TIME_UNITS -p numSegments=$NUM_SEGMENTS -p numOwners=$NUM_OWNERS -p numNodes=$NUM_NODES"
 
 mvn clean package -Dversion.infinispan=$INFINISPAN_VERSION -Dversion.jgroups=$JGROUPS_VERSION
 exit_on_error mvn
@@ -147,6 +114,7 @@ fi
 # perfasm output
 if [ "$LOG_PERFASM" == "1" ] ; then
    echo Collecting perfasm profiler logs
+   LD_LIBRARY_PATH=$HOME/Tools/java-disassembler \
    run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $PERFASM_OPTS" -f 1 -prof perfasm:hotThreshold=0.01 $TEST $PARAMS >>$BASENAME-perfasm.log 2>&1
    log_version >> $BASENAME-perfasm.log
 fi
@@ -191,7 +159,7 @@ for COMMIT in $INFINISPAN_COMMITS; do
   mvn install -s maven-settings.xml -DskipTests -am -pl core
   INFINISPAN_VERSION=$(cat core/pom.xml | perl -ne 'if (/<version>(.*)<\/version>/) { print "$1\n" }' | head -1)
   if [ -z $FORCE_JGROUPS_VERSION ]; then
-    JGROUPS_VERSION=$(cat bom/pom.xml | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
+    JGROUPS_VERSION=$(cat build-configuration/pom.xml | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
   else
     JGROUPS_VERSION=$FORCE_JGROUPS_VERSION
   fi

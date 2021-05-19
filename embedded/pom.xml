@@ -18,17 +18,11 @@
    </prerequisites>
 
    <properties>
-      <version.infinispan>9.0.0-SNAPSHOT</version.infinispan>
-      <version.jgroups>4.0.0.Beta3</version.jgroups>
+      <version.infinispan>11.0.0-SNAPSHOT</version.infinispan>
+      <version.jgroups>4.0.6.Final</version.jgroups>
    </properties>
 
    <dependencies>
-      <dependency>
-         <groupId>org.infinispan</groupId>
-         <artifactId>infinispan-microbenchmarks-common</artifactId>
-         <version>1.0-SNAPSHOT</version>
-      </dependency>
-
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-core</artifactId>
@@ -73,7 +67,7 @@
       <dependency>
          <groupId>org.jboss.narayana.jta</groupId>
          <artifactId>narayana-jta</artifactId>
-         <version>5.2.16.Final-redhat-1</version>
+         <version>RELEASE</version>
       </dependency>
    </dependencies>
 </project>

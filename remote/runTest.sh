@@ -9,7 +9,7 @@ BENCHMARK_TIME_UNITS=s
 #BENCHMARK_MODE=sample
 #BENCHMARK_TIME_UNITS=ns
 CLUSTER_SIZE=8
-NUM_THREADS=100
+NUM_THREADS=20
 KEY_SIZE=20
 VALUE_SIZE=1000
 NUM_KEYS=1000
@@ -17,22 +17,10 @@ FILL_RATIO=1.0
 WARMUP_SECONDS=60
 TEST_SECONDS=45
 
-#PREFIX=All ; TEST=".*CacheBenchmark.*"
-#PREFIX=NonTxRead ; TEST="(Local|Repl|RandomDist).*testGet"
-#PREFIX=ETxRead ; TEST="(Repl|RandomDist).*testTxGet"
-#PREFIX=LocalRead ; TEST="Local.*testGet"
-PREFIX=LocalWrite ; TEST="Local.*testPut"
-#PREFIX=NonTxReplRead ; TEST="Repl.*testGet"
-#PREFIX=ReplWrite ; TEST="Repl.*testPut"
-#PREFIX=ETxReplRead ; TEST="Repl.*testTxGet"
-#PREFIX=ETxReplWrite ; TEST="Repl.*testTxPut"
-#PREFIX=Repl ; TEST="Repl.*"
-#PREFIX=PrimaryDistRead ; TEST="PrimaryDist.*testGet"
-#PREFIX=PrimaryDistWrite ; TEST="PrimaryDistC.*testPut"
-#PREFIX=RandomDistRead ; TEST="RandomDist.*testGet"
-#PREFIX=RandomDistWrite ; TEST="RandomDistC.*testPut"
-#PREFIX=RandomDistTxRead ; TEST="RandomDist.*testTxGet"
-#PREFIX=MH3 ; TEST="MurmurHash3Benchmark.testHash"
+#PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
+PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
+#PREFIX=MDDistRead ; TEST="MemcachedDist.*testGet"
+#PREFIX=MDDistWrite ; TEST="MemcachedDist.*testPut"
 
 LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=0; LOG_JFR=0
 LOG_MAIN=1
@@ -45,31 +33,29 @@ LOG_JFR=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
 #INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1"
-#INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1 8.4.0.ER5-redhat-1"
-#INFINISPAN_PREBUILT_VERSIONS="6.4.2.DR1-redhat-1 6.4.1.Final-redhat-1"
+INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1 8.4.0.ER5-redhat-1"
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
 #INFINISPAN_HOME=$WORK_DIR/jdg
 
 INFINISPAN_COMMITS=""
-INFINISPAN_COMMITS="ISPN-wrapped_bytes_hash"
-#INFINISPAN_COMMITS="master ISPN-8410_off-heap_crash ISPN-wrapped_bytes_hash ISPN-off-heap-disabled"
+#INFINISPAN_COMMITS="master"
+#INFINISPAN_COMMITS="master t_async_api_change_experiments_16"
+#INFINISPAN_COMMITS="master t_async_api_change_experiments_3 t_async_api_change_experiments_8"
+#INFINISPAN_COMMITS="master t_async_api_change_experiments t_async_api_change_experiments_2 t_async_api_change_experiments_3 t_async_api_change_experiments_4 t_async_api_change_experiments_5 t_async_api_change_experiments_6"
 #INFINISPAN_COMMITS="JDG_7.0.0.GA JDG_7.1.0.ER1 jdg-7.1.x"
 #INFINISPAN_COMMITS="JDG-685/JDG-670/no-bundler/replicated_reads"
 
 FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="3.6.10.Final"
 
-INFINISPAN_CONFIG="../config/infinispan-sync9.xml"
-#INFINISPAN_CONFIG="../config/infinispan-synctx.xml"
-#INFINISPAN_CONFIG="../config/infinispan6-synctx.xml"
+#INFINISPAN_CONFIG="../config/infinispan-sync.xml"
+INFINISPAN_CONFIG="../config/infinispan-synctx.xml"
 
-JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
 #JGROUPS_CONFIG="../config/jgroups-tcp-ufc.xml"
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
-#JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
-#JGROUPS_CONFIG="../config/jdg662_modified_udp.xml"
+JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
 
 COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
 COMMON_OPTS="$COMMON_OPTS -Dlog4j.configurationFile=file:///$WORK_DIR/infinispan-microbenchmarks/config/log4j2.xml"
@@ -83,7 +69,7 @@ JFR_PARENT_OPTIONS="-Djmh.jfr.stackdepth=128"
 ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/allocation_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 #ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/exception_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 
-cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
+#cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
 
 function run_java() {
 #  $JAVA_HOME/bin/java "$@"
@@ -95,7 +81,7 @@ function log_version() {
   echo Infinispan $INFINISPAN_VERSION
   echo JGroups $JGROUPS_VERSION
   echo Current infinispan working dir commits:
-  echo "$LAST_COMMITS"
+  echo $LAST_COMMITS
   echo
 }
 
@@ -118,7 +104,7 @@ echo Results will be in $BASENAME.log
 
 # straight results
 if [ "$LOG_MAIN" == "1" ] ; then
-  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $THROUGHPUT_OPTS" -f 3 $TEST $PARAMS >>$BASENAME.log 2>&1
+  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $THROUGHPUT_OPTS" -f 3 $TEST $PARAMS >>$BASENAME.log
   log_version >> $BASENAME.log
 fi
 if [ "$LOG_HICCUP" == "1" ] ; then
@@ -133,12 +119,12 @@ fi
 # perfnorm output
 if [ "$LOG_PERFNORM" == "1" ] ; then
    echo Collecting perfnorm profiler logs
-   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof perfnorm $TEST $PARAMS >>$BASENAME-perfnorm-gc.log 2>&1
+   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof perfnorm $TEST $PARAMS >>$BASENAME-perfnorm-gc.log
 fi
 # gc output
 if [ "$LOG_GC" == "1" ] ; then
    echo Collecting gc profiler logs
-   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof gc $TEST $PARAMS >>$BASENAME-perfnorm-gc.log 2>&1
+   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 -prof gc $TEST $PARAMS >>$BASENAME-perfnorm-gc.log
 fi
 if [ "$LOG_PERFNORM" == "1" -o "$LOG_GC" == "1" ] ; then
   log_version >> $BASENAME-perfnorm-gc.log
@@ -147,14 +133,14 @@ fi
 # perfasm output
 if [ "$LOG_PERFASM" == "1" ] ; then
    echo Collecting perfasm profiler logs
-   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $PERFASM_OPTS" -f 1 -prof perfasm:hotThreshold=0.01 $TEST $PARAMS >>$BASENAME-perfasm.log 2>&1
+   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $PERFASM_OPTS" -f 1 -prof perfasm:hotThreshold=0.01 $TEST $PARAMS &>$BASENAME-perfasm.log
    log_version >> $BASENAME-perfasm.log
 fi
 
 # jitwatch output
 if [ "$LOG_JITWATCH" == "1" ] ; then
    echo Collecting jitwatch logs
-   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JITWATCH_OPTS" -f 1 $TEST $PARAMS
+   taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JITWATCH_OPTS" -f 1 $TEST $PARAMS
    mv $(ls -t hotspot_pid*.log | head -1) $BASENAME-jitwatch.log
 fi
 
@@ -188,14 +174,14 @@ for COMMIT in $INFINISPAN_COMMITS; do
   pushd $BUILD_DIR
   git checkout $COMMIT
   mvn clean
-  mvn install -s maven-settings.xml -DskipTests -am -pl core
+  mvn install -DskipTests -am -pl core
   INFINISPAN_VERSION=$(cat core/pom.xml | perl -ne 'if (/<version>(.*)<\/version>/) { print "$1\n" }' | head -1)
   if [ -z $FORCE_JGROUPS_VERSION ]; then
     JGROUPS_VERSION=$(cat bom/pom.xml | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
   else
     JGROUPS_VERSION=$FORCE_JGROUPS_VERSION
   fi
-  LAST_COMMITS="$(git log --pretty=format:"%H %s" -3 | git name-rev --stdin)"
+  LAST_COMMITS=$(git log --pretty=format:"%H %s" -3 | git name-rev --stdin)
   popd
 
   run_build || echo "Failed to run test for $COMMIT"

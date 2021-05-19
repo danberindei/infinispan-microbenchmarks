@@ -25,12 +25,6 @@
    <dependencies>
       <dependency>
          <groupId>org.infinispan</groupId>
-         <artifactId>infinispan-microbenchmarks-common</artifactId>
-         <version>1.0-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-         <groupId>org.infinispan</groupId>
          <artifactId>infinispan-core</artifactId>
          <version>${infinispan.version}</version>
          <exclusions>

@@ -9,7 +9,7 @@
         <stack-file name="jgroupsStack" path="set by benchmark"/>
     </jgroups>
 
-    <cache-container name="default" default-cache="testCache" statistics="false">
+    <cache-container name="default" default-cache="local" statistics="false">
         <transport stack="jgroupsStack" lock-timeout="600000" cluster="default" />
         <serialization>
             <!--<advanced-externalizer-->
@@ -19,11 +19,13 @@
             <property name="enabled">false</property>
         </jmx>
 
-        <distributed-cache name="dist-sync" mode="SYNC" remote-timeout="60000" statistics="true" l1-lifespan="-1" owners="2" segments="512">
+        <local-cache name="local">
+        </local-cache>
+        <distributed-cache name="dist-sync" mode="SYNC" remote-timeout="10000" statistics="true" l1-lifespan="-1" owners="2" segments="512">
             <locking acquire-timeout="30000" concurrency-level="1000" />
             <state-transfer timeout="60000" />
         </distributed-cache>
-        <replicated-cache name="repl-sync" mode="SYNC" remote-timeout="1000" statistics="true">
+        <replicated-cache name="repl-sync" mode="SYNC" remote-timeout="10000" statistics="true">
             <locking acquire-timeout="30000" concurrency-level="1000"/>
             <state-transfer timeout="60000"/>
         </replicated-cache>

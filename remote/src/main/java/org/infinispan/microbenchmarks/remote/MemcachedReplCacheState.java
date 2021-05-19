@@ -2,11 +2,9 @@ package org.infinispan.microbenchmarks.remote;
 
 import net.spy.memcached.MemcachedClient;
 import org.infinispan.Cache;
-import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.manager.DefaultCacheManager;
-import org.infinispan.microbenchmarks.common.KeySource;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
 import org.infinispan.server.memcached.MemcachedServer;
 import org.infinispan.server.memcached.configuration.MemcachedServerConfiguration;
