@@ -133,7 +133,7 @@
 
    <modules>
       <module>common</module>
-      <module>embedded</module>
-      <!--<module>remote</module>-->
+<!--      <module>embedded</module>-->
+      <module>remote</module>
    </modules>
 </project>

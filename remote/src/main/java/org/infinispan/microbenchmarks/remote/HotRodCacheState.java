@@ -4,6 +4,8 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.Configuration;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.infinispan.client.hotrod.configuration.ServerConfigurationBuilder;
+import org.infinispan.configuration.internal.PrivateGlobalConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.manager.DefaultCacheManager;
@@ -20,6 +22,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
 import java.io.IOException;
+import java.util.Properties;
 
 @State(Scope.Benchmark)
 public class HotRodCacheState {
@@ -44,6 +47,7 @@ public class HotRodCacheState {
 
    @Setup
    public void setup(KeySource keySource) throws IOException {
+      System.setProperty("jgroups.stack.file", jgroupsConfig);
       Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
          log.fatalf(e, "(%s:) Unhandled exception", t);
       });
@@ -51,6 +55,7 @@ public class HotRodCacheState {
       servers = new HotRodServer[clusterSize];
       for (int i = 0; i < clusterSize; i++) {
          ConfigurationBuilderHolder embeddedConfiguration = new ParserRegistry().parseFile(infinispanConfig);
+         embeddedConfiguration.getGlobalConfigurationBuilder().addModule(PrivateGlobalConfigurationBuilder.class).serverMode(true);
          embeddedConfiguration.getGlobalConfigurationBuilder().transport().nodeName("Node" + (char) ('A' + i))
                .addProperty(JGroupsTransport.CONFIGURATION_FILE, jgroupsConfig);
          managers[i] = new DefaultCacheManager(embeddedConfiguration, true);
@@ -77,10 +82,10 @@ public class HotRodCacheState {
       System.out.println("Running with " + org.jgroups.Version.printDescription());
       log.infof("Started repl cache with CH %s",
             managers[0].getCache(replCacheName).getAdvancedCache().getDistributionManager()
-                  .getConsistentHash());
+                  .getWriteConsistentHash());
       log.infof("Started dist cache with CH %s",
             managers[0].getCache(replCacheName).getAdvancedCache().getDistributionManager()
-                  .getConsistentHash());
+                  .getWriteConsistentHash());
       keySource.populateCache((key, value) -> replCaches[0].put(key, value));
       keySource.populateCache((key, value) -> distCaches[0].put(key, value));
    }
@@ -88,11 +93,17 @@ public class HotRodCacheState {
    @TearDown
    public void tearDown() {
       for (int i = 0; i < clusterSize; i++) {
-         remoteManagers[i].stop();
+         if (remoteManagers[i] != null) {
+            remoteManagers[i].stop();
+         }
       }
       for (int i = 0; i < clusterSize; i++) {
-         servers[i].stop();
-         managers[i].stop();
+         if (servers[i] != null) {
+            servers[i].stop();
+         }
+         if (managers[i] != null) {
+            managers[i].stop();
+         }
       }
    }
 

@@ -18,8 +18,8 @@
    </prerequisites>
 
    <properties>
-      <version.infinispan>11.0.0-SNAPSHOT</version.infinispan>
-      <version.jgroups>4.0.6.Final</version.jgroups>
+      <version.infinispan>13.0.0-SNAPSHOT</version.infinispan>
+      <version.jgroups>4.2.14.Final</version.jgroups>
    </properties>
 
    <dependencies>

@@ -8,24 +8,26 @@ BENCHMARK_MODE=thrpt
 BENCHMARK_TIME_UNITS=s
 #BENCHMARK_MODE=sample
 #BENCHMARK_TIME_UNITS=ns
-CLUSTER_SIZE=8
-NUM_THREADS=20
+CLUSTER_SIZE=4
+NUM_THREADS=8
 KEY_SIZE=20
 VALUE_SIZE=1000
-NUM_KEYS=1000
-FILL_RATIO=1.0
-WARMUP_SECONDS=60
+NUM_KEYS=100000
+FILL_RATIO=0.7
+WARMUP_SECONDS=45
 TEST_SECONDS=45
+#TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt
+TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt
 
-#PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
-PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
+PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
+#PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
 #PREFIX=MDDistRead ; TEST="MemcachedDist.*testGet"
 #PREFIX=MDDistWrite ; TEST="MemcachedDist.*testPut"
 
 LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=0; LOG_JFR=0
 LOG_MAIN=1
 #LOG_HICCUP=1
-#LOG_PERFNORM=1
+LOG_PERFNORM=1
 #LOG_GC=1
 #LOG_JITWATCH=1
 LOG_PERFASM=1
@@ -33,7 +35,7 @@ LOG_JFR=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
 #INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1"
-INFINISPAN_PREBUILT_VERSIONS="8.3.0.Final-redhat-1 8.4.0.ER5-redhat-1"
+INFINISPAN_PREBUILT_VERSIONS="9.4.21.Final 11.0.9.Final"
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
@@ -41,39 +43,37 @@ INFINISPAN_HOME=$WORK_DIR/infinispan
 
 INFINISPAN_COMMITS=""
 #INFINISPAN_COMMITS="master"
-#INFINISPAN_COMMITS="master t_async_api_change_experiments_16"
-#INFINISPAN_COMMITS="master t_async_api_change_experiments_3 t_async_api_change_experiments_8"
-#INFINISPAN_COMMITS="master t_async_api_change_experiments t_async_api_change_experiments_2 t_async_api_change_experiments_3 t_async_api_change_experiments_4 t_async_api_change_experiments_5 t_async_api_change_experiments_6"
 #INFINISPAN_COMMITS="JDG_7.0.0.GA JDG_7.1.0.ER1 jdg-7.1.x"
-#INFINISPAN_COMMITS="JDG-685/JDG-670/no-bundler/replicated_reads"
 
 FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="3.6.10.Final"
 
 #INFINISPAN_CONFIG="../config/infinispan-sync.xml"
-INFINISPAN_CONFIG="../config/infinispan-synctx.xml"
+INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"
 
 #JGROUPS_CONFIG="../config/jgroups-tcp-ufc.xml"
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
 JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
 
-COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseConcMarkSweepGC -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true -Dorg.jboss.logging.provider=log4j2"
-COMMON_OPTS="$COMMON_OPTS -Dlog4j.configurationFile=file:///$WORK_DIR/infinispan-microbenchmarks/config/log4j2.xml"
+#COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseG1GC -XX:+PrintGCDetails -XX:+PrintGCApplicationStoppedTime -Xloggc:gc.log -Djava.net.preferIPv4Stack=true"
+COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseG1GC -Xlog:gc*,safepoint:gc.log:time,uptime -Djava.net.preferIPv4Stack=true"
+COMMON_OPTS="$COMMON_OPTS -Dlog4j.configurationFile=file:///$WORK_DIR/infinispan-microbenchmarks/config/log4j2.xml -Dorg.jboss.logging.provider=log4j2"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
 #THROUGHPUT_OPTS="-javaagent:/$WORK_DIR/jHiccup/jHiccup.jar=\"-d $WARMUP_SECONDS -i 1000 -l hiccup.hlog\" -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime"
-THROUGHPUT_OPTS="-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime"
+THROUGHPUT_OPTS=""
 PERFASM_OPTS="-XX:PrintAssemblyOptions=intel"
 JITWATCH_OPTS="-XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintInlining -XX:+PrintAssembly -XX:PrintAssemblyOptions=intel"
 JFR_OPTIONS=""
 JFR_PARENT_OPTIONS="-Djmh.jfr.stackdepth=128"
-ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/allocation_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
+ALT_JFR_OPTIONS="-XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128 -XX:StartFlightRecording=settings=profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
+#ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128 -XX:StartFlightRecording=settings=../config/allocation_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 #ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/exception_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 
 #cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
 
 function run_java() {
-#  $JAVA_HOME/bin/java "$@"
-  taskset -c 4-7 $JAVA_HOME/bin/java "$@"
+#  $TEST_JAVA_HOME/bin/java "$@"
+  taskset -c 4-7 $TEST_JAVA_HOME/bin/java "$@"
 }
 
 function log_version() {
@@ -133,14 +133,16 @@ fi
 # perfasm output
 if [ "$LOG_PERFASM" == "1" ] ; then
    echo Collecting perfasm profiler logs
-   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $PERFASM_OPTS" -f 1 -prof perfasm:hotThreshold=0.01 $TEST $PARAMS &>$BASENAME-perfasm.log
+   LD_LIBRARY_PATH=/home/dan/Work/hotspot/src/share/tools/hsdis/build/linux-amd64/ \
+   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $PERFASM_OPTS" -f 1 \
+   -prof perfasm:hotThreshold=0.01 $TEST $PARAMS &>$BASENAME-perfasm.log
    log_version >> $BASENAME-perfasm.log
 fi
 
 # jitwatch output
 if [ "$LOG_JITWATCH" == "1" ] ; then
    echo Collecting jitwatch logs
-   taskset -c 4-7 $JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JITWATCH_OPTS" -f 1 $TEST $PARAMS
+   taskset -c 4-7 $TEST_JAVA_HOME/bin/java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $JITWATCH_OPTS" -f 1 $TEST $PARAMS
    mv $(ls -t hotspot_pid*.log | head -1) $BASENAME-jitwatch.log
 fi
 

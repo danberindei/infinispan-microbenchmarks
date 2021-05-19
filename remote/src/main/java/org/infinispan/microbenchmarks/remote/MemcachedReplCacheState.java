@@ -78,10 +78,10 @@ public class MemcachedReplCacheState {
       System.out.println("Running with " + org.jgroups.Version.printDescription());
       log.infof("Started repl cache with CH %s",
             managers[0].getCache(cacheName).getAdvancedCache().getDistributionManager()
-                  .getConsistentHash());
+                  .getWriteConsistentHash());
       log.infof("Started dist cache with CH %s",
             managers[0].getCache(cacheName).getAdvancedCache().getDistributionManager()
-                  .getConsistentHash());
+                  .getWriteConsistentHash());
       Cache<Object, Object> embeddedCache = managers[0].getCache(cacheName);
       keySource.populateCache((key, value) -> embeddedCache.put(key, value.getBytes()));
    }
