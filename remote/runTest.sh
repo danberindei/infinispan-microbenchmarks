@@ -35,8 +35,13 @@ LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=
 LOG_ASYNC=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
-INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
+INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 8.4.2.Final-redhat-1"
+INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="13.0.0.DevAsyncTouch"
+
+MAVEN_SETTINGS=/home/dan/Work/jdg/maven-settings.xml
+MAVEN_REPO=$(cat $MAVEN_SETTINGS | perl -ne 'if (/<localRepository>(.*)<\/localRepository>/) { print "$1\n" }' | sed "s%\${user.home}%$HOME%")
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
@@ -51,7 +56,7 @@ FORCE_JGROUPS_VERSION=""
 
 #INFINISPAN_CONFIG="../config/infinispan-sync.xml"
 #INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
-INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"
+INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
 
 #JGROUPS_CONFIG="../config/jgroups-tcp-ufc.xml"
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
@@ -102,7 +107,7 @@ function exit_on_error() {
 function run_build() {
 PARAMS="-t $NUM_THREADS -w 5 -wi $((WARMUP_SECONDS / 5)) -r 5 -i $((TEST_SECONDS / 5)) -bm $BENCHMARK_MODE -tu $BENCHMARK_TIME_UNITS -p infinispanConfig=$INFINISPAN_CONFIG -p jgroupsConfig=$JGROUPS_CONFIG -p clusterSize=$CLUSTER_SIZE -p initialFillRatio=$FILL_RATIO -p numKeys=${NUM_KEYS} -p keySize=${KEY_SIZE} -p valueSize=${VALUE_SIZE}"
 
-mvn clean package -Dversion.infinispan=$INFINISPAN_VERSION -Dversion.jgroups=$JGROUPS_VERSION | tee build.log | tail -20
+mvn -s $MAVEN_SETTINGS clean package -Dversion.infinispan=$INFINISPAN_VERSION -Dversion.jgroups=$JGROUPS_VERSION | tee build.log | tail -20
 exit_on_error mvn
 
 BASENAME=$PREFIX-$(date +%Y%m%d-%H%M)-${SUFFIX//[^a-zA-Z0-9-_.]/_}
@@ -203,7 +208,13 @@ for COMMIT in $INFINISPAN_COMMITS; do
   mvn install -DskipTests -am -pl core
   INFINISPAN_VERSION=$(cat core/pom.xml | perl -ne 'if (/<version>(.*)<\/version>/) { print "$1\n" }' | head -1)
   if [ -z $FORCE_JGROUPS_VERSION ]; then
-    JGROUPS_VERSION=$(cat build-configuration/pom.xml | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
+    if [[ -d build-configuration ]]; then
+      JGROUPS_VERSION=$(cat build-configuration/pom.xml | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
+    elif [ -d bom ]; then
+      JGROUPS_VERSION=$(cat bom/pom.xml | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
+    else
+      exit_on_error jgroups_version
+    fi
   else
     JGROUPS_VERSION=$FORCE_JGROUPS_VERSION
   fi
@@ -217,8 +228,14 @@ done
 for INFINISPAN_VERSION in $INFINISPAN_PREBUILT_VERSIONS; do
   SUFFIX=$INFINISPAN_VERSION
   if [ -z $FORCE_JGROUPS_VERSION ]; then
-    mvn compile -Dversion.infinispan=$INFINISPAN_VERSION
-    JGROUPS_VERSION=$(cat ~/.m2/repository/org/infinispan/infinispan-build-configuration-parent/$INFINISPAN_VERSION/infinispan-build-configuration-parent-$INFINISPAN_VERSION.pom | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
+    mvn -s $MAVEN_SETTINGS compile -Dversion.infinispan=$INFINISPAN_VERSION
+    if [[ -d $MAVEN_REPO/org/infinispan/infinispan-build-configuration-parent/$INFINISPAN_VERSION ]]; then
+      JGROUPS_VERSION=$(cat $MAVEN_REPO/org/infinispan/infinispan-build-configuration-parent/$INFINISPAN_VERSION/infinispan-build-configuration-parent-$INFINISPAN_VERSION.pom | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
+    elif [ -d $MAVEN_REPO/org/infinispan/infinispan-bom/$INFINISPAN_VERSION ]; then
+      JGROUPS_VERSION=$(cat $MAVEN_REPO/org/infinispan/infinispan-bom/$INFINISPAN_VERSION/infinispan-bom-$INFINISPAN_VERSION.pom | perl -ne 'if (/<version.jgroups>(.*)<\/version.jgroups>/) { print "$1\n" }')
+    else
+      exit_on_error jgroups_version
+    fi
   else
     JGROUPS_VERSION=$FORCE_JGROUPS_VERSION
   fi

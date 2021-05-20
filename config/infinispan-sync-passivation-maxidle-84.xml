@@ -2,8 +2,8 @@
 
 <infinispan
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="urn:infinispan:config:9.4 http://www.infinispan.org/schemas/infinispan-config-9.4.xsd"
-        xmlns="urn:infinispan:config:9.4">
+        xsi:schemaLocation="urn:infinispan:config:8.4 http://www.infinispan.org/schemas/infinispan-config-8.4.xsd"
+        xmlns="urn:infinispan:config:8.4">
 
     <jgroups>
         <stack-file name="jgroupsStack" path="${jgroups.stack.file}"/>
@@ -23,9 +23,7 @@
             <persistence passivation="true">
                 <file-store fetch-state="true" max-entries="5000000" path="internet-session-filestore" preload="false" purge="true" relative-to="jboss.server.data.dir" shared="false"></file-store>
             </persistence>
-            <memory>
-                <binary size="10000000" eviction="COUNT"/>
-            </memory>
+            <eviction strategy="LRU" size="10000000"/>
         </distributed-cache>
         <replicated-cache mode="SYNC" name="repl-sync" remote-timeout="21000"  start="EAGER">
             <locking acquire-timeout="1000" concurrency-level="1000" isolation="READ_COMMITTED" striping="false"></locking>
@@ -34,9 +32,7 @@
             <persistence passivation="true">
                 <file-store fetch-state="true" max-entries="5000000" path="internet-session-filestore" preload="false" purge="true" relative-to="jboss.server.data.dir" shared="false"></file-store>
             </persistence>
-            <memory>
-                <binary size="10000000" eviction="COUNT"/>
-            </memory>
+            <eviction strategy="LRU" size="10000000"/>
         </replicated-cache>
     </cache-container>
 
