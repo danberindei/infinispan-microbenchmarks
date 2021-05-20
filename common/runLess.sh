@@ -8,7 +8,7 @@ PERFASM_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:PrintAss
 JITWATCH_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:-TieredCompilation -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintInlining -XX:+PrintAssembly -XX:PrintAssemblyOptions=intel"
 JFR_OPTIONS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:FlightRecorderOptions=stackdepth=128"
 
-mvn clean package -Dinfinispan.version=9.0.0-SNAPSHOT
+mvn clean package -Dversion.infinispan=9.0.0-SNAPSHOT
 
 i=1
 while [[ -f $PREFIX-$i-throughput.log ]]; do

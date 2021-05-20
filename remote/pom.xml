@@ -18,15 +18,15 @@
    </prerequisites>
 
    <properties>
-      <infinispan.version>9.4.21.Final</infinispan.version>
-      <jgroups.version>4.0.21.Final</jgroups.version>
+      <version.infinispan>9.4.21.Final</version.infinispan>
+      <version.jgroups>4.0.21.Final</version.jgroups>
    </properties>
 
    <dependencies>
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-core</artifactId>
-         <version>${infinispan.version}</version>
+         <version>${version.infinispan}</version>
          <exclusions>
             <exclusion>
                <groupId>org.jgroups</groupId>
@@ -37,7 +37,7 @@
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-server-hotrod</artifactId>
-         <version>${infinispan.version}</version>
+         <version>${version.infinispan}</version>
          <exclusions>
             <exclusion>
                <groupId>org.jgroups</groupId>
@@ -48,7 +48,7 @@
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-client-hotrod</artifactId>
-         <version>${infinispan.version}</version>
+         <version>${version.infinispan}</version>
          <exclusions>
             <exclusion>
                <groupId>org.jgroups</groupId>
@@ -59,7 +59,7 @@
       <dependency>
          <groupId>org.infinispan</groupId>
          <artifactId>infinispan-server-memcached</artifactId>
-         <version>${infinispan.version}</version>
+         <version>${version.infinispan}</version>
          <exclusions>
             <exclusion>
                <groupId>org.jgroups</groupId>
@@ -70,7 +70,7 @@
       <dependency>
          <groupId>org.jgroups</groupId>
          <artifactId>jgroups</artifactId>
-         <version>${jgroups.version}</version>
+         <version>${version.jgroups}</version>
       </dependency>
       <dependency>
          <groupId>org.jboss.spec.javax.transaction</groupId>
