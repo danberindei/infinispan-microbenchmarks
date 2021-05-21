@@ -1,6 +1,7 @@
 package org.infinispan.microbenchmarks.remote;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 
@@ -23,12 +24,14 @@ public class KeySource {
 
    String[] keys;
    String[] values;
+   byte[][] byteArrayKeys;
    byte[][] byteArrayValues;
 
    @Setup
    public void setup() {
       keys = new String[numKeys];
       values = new String[numKeys];
+      byteArrayKeys = new byte[numKeys][];
       byteArrayValues = new byte[numKeys][];
 
       byte[] keyBytes = new byte[keySize];
@@ -36,6 +39,7 @@ public class KeySource {
       for (int i = 0; i < numKeys; i++) {
          keys[i] = randomString(keyBytes);
          values[i] = randomString(valueBytes);
+         byteArrayKeys[i] = keys[i].getBytes();
          byteArrayValues[i] = values[i].getBytes();
       }
    }
@@ -59,6 +63,10 @@ public class KeySource {
 
    public String nextValue() {
       return values[ThreadLocalRandom.current().nextInt(numKeys)];
+   }
+
+   public byte[] nextByteArrayKey() {
+      return byteArrayKeys[ThreadLocalRandom.current().nextInt(numKeys)];
    }
 
    public byte[] nextByteArrayValue() {

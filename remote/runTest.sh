@@ -18,7 +18,7 @@ FILL_RATIO=0.7
 WARMUP_SECONDS=45
 TEST_SECONDS=45
 
-PREFIX=HRDistReadAsyncTouch ; TEST="HotRodDist.*testGet"
+PREFIX=HRDistReadAsyncTouch-sync-touch ; TEST="HotRodDist.*testGet"
 #PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
 #PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
 #PREFIX=MDDistRead ; TEST="MemcachedDist.*testGet"
@@ -32,16 +32,20 @@ LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=
 #LOG_JITWATCH=1
 #LOG_PERFASM=1
 #LOG_JFR=1
-LOG_ASYNC=1
+#LOG_ASYNC=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
-INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 8.4.2.Final-redhat-1"
-INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
+#INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final"
+#INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
+INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2"
 #INFINISPAN_PREBUILT_VERSIONS="13.0.0.DevAsyncTouch"
 
-MAVEN_SETTINGS=/home/dan/Work/jdg/maven-settings.xml
+MAVEN_SETTINGS=/home/dan/Work/infinispan/maven-settings.xml
 MAVEN_REPO=$(cat $MAVEN_SETTINGS | perl -ne 'if (/<localRepository>(.*)<\/localRepository>/) { print "$1\n" }' | sed "s%\${user.home}%$HOME%")
+if [ -z "$MAVEN_REPO" ]; then
+  MAVEN_REPO=~/.m2/repository
+fi
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
@@ -55,12 +59,12 @@ FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="4.2.12.Final"
 
 #INFINISPAN_CONFIG="../config/infinispan-sync.xml"
-#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
-INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
+INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
+#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
 
-#JGROUPS_CONFIG="../config/jgroups-tcp-ufc.xml"
+JGROUPS_CONFIG="../config/94x-udp-transfer-queue.xml"
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
-JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
+#JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
 
 TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt
 #TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt

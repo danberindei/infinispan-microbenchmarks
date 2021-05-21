@@ -16,11 +16,11 @@ public class HotRodDistCacheBenchmark {
 
    @Benchmark
    public Object testGet(Blackhole blackhole, HotRodCacheState state, KeySource keySource) {
-      return state.getDistCache(Thread.currentThread().getId()).get(keySource.nextKey());
+      return state.getDistCache(Thread.currentThread().getId()).get(keySource.nextByteArrayKey());
    }
 
    @Benchmark
    public Object testPut(Blackhole blackhole, HotRodCacheState state, KeySource keySource) {
-      return state.getDistCache(Thread.currentThread().getId()).put(keySource.nextKey(), keySource.nextValue());
+      return state.getDistCache(Thread.currentThread().getId()).put(keySource.nextByteArrayKey(), keySource.nextByteArrayValue());
    }
 }
