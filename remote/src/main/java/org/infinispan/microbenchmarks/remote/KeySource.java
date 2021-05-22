@@ -77,9 +77,9 @@ public class KeySource {
       return numKeys;
    }
 
-   public void populateCache(BiConsumer<String, String> writer) {
+   public void populateCache(BiConsumer<Object, Object> writer) {
       for (int i = 0; i < numKeys * initialFillRatio; i++) {
-         writer.accept(keys[i], values[i]);
+         writer.accept(byteArrayKeys[i], byteArrayValues[i]);
       }
    }
 }

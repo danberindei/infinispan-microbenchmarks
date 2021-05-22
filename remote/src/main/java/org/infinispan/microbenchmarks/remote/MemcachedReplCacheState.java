@@ -83,7 +83,7 @@ public class MemcachedReplCacheState {
             managers[0].getCache(cacheName).getAdvancedCache().getDistributionManager()
                   .getWriteConsistentHash());
       Cache<Object, Object> embeddedCache = managers[0].getCache(cacheName);
-      keySource.populateCache((key, value) -> embeddedCache.put(key, value.getBytes()));
+      keySource.populateCache((key, value) -> embeddedCache.put(key, value));
    }
 
    @TearDown

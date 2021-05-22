@@ -4,7 +4,7 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.Configuration;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
-import org.infinispan.client.hotrod.configuration.ServerConfigurationBuilder;
+import org.infinispan.commons.marshall.IdentityMarshaller;
 import org.infinispan.configuration.internal.PrivateGlobalConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
@@ -15,14 +15,9 @@ import org.infinispan.server.hotrod.configuration.HotRodServerConfiguration;
 import org.infinispan.server.hotrod.configuration.HotRodServerConfigurationBuilder;
 import org.infinispan.util.logging.Log;
 import org.infinispan.util.logging.LogFactory;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
+import org.openjdk.jmh.annotations.*;
 
 import java.io.IOException;
-import java.util.Properties;
 
 @State(Scope.Benchmark)
 public class HotRodCacheState {
@@ -70,8 +65,10 @@ public class HotRodCacheState {
       replCaches = new RemoteCache[clusterSize];
       distCaches = new RemoteCache[clusterSize];
       for (int i = 0; i < clusterSize; i++) {
-         Configuration remoteConfiguration =
-               new ConfigurationBuilder().addServer().host(host).port(basePort + 1).build();
+         Configuration remoteConfiguration = new ConfigurationBuilder()
+                 .addServer().host(host).port(basePort + 1)
+                 .marshaller(IdentityMarshaller.class)
+                 .build();
          remoteManagers[i] = new RemoteCacheManager(remoteConfiguration);
          replCaches[i] = remoteManagers[i].getCache(replCacheName);
          distCaches[i] = remoteManagers[i].getCache(distCacheName);

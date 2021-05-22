@@ -15,10 +15,10 @@ KEY_SIZE=20
 VALUE_SIZE=1000
 NUM_KEYS=100000
 FILL_RATIO=0.7
-WARMUP_SECONDS=60
-TEST_SECONDS=60
+WARMUP_SECONDS=50
+TEST_SECONDS=50
 
-PREFIX=HRDistRead-nt ; TEST="HotRodDist.*testGet"
+PREFIX=HRDistRead-at ; TEST="HotRodDist.*testGet"
 #PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
 #PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
 #PREFIX=MDDistRead ; TEST="MemcachedDist.*testGet"
@@ -35,15 +35,16 @@ LOG_MAIN=1
 LOG_ASYNC=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
-#INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final"
-INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
-#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
+#INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
+#INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
+INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2"
-#INFINISPAN_PREBUILT_VERSIONS="13.0.0.DevAsyncTouch"
+INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 9.4.24.DevAsyncTouch2 13.0.0.DevAsyncTouch"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch3"
 
 WORK_DIR=$HOME/Work
-#INFINISPAN_HOME=$WORK_DIR/infinispan
-INFINISPAN_HOME=$WORK_DIR/jdg
+INFINISPAN_HOME=$WORK_DIR/infinispan
+#INFINISPAN_HOME=$WORK_DIR/jdg
 
 
 INFINISPAN_COMMITS=""
@@ -60,12 +61,13 @@ FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="4.2.12.Final"
 
 #INFINISPAN_CONFIG="../config/infinispan-sync.xml"
-#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
-INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
+#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
+INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
+#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"
 
-#JGROUPS_CONFIG="../config/94x-udp-transfer-queue.xml"
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
 JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
+#JGROUPS_CONFIG="../config/udp-transfer-queue-94.xml"
 
 TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt
 #TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt

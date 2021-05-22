@@ -1,9 +1,5 @@
 ## JDG 7.1.x
 #### no touch
-107175.989 ± 4476.349  ops/s
-ap 90183.205 ± 2458.410  ops/s
-102180.782 ± 3886.030  ops/s
-ap 89681.014 ± 1928.761  ops/s
 
 ## Infinispan 9.4.x
 #### sync touch
@@ -12,8 +8,16 @@ ap 89681.014 ± 1928.761  ops/s
 #### sync touch
 
 #### async touch
+39930.500 ± 2219.054  ops/s
+ap 34021.164 ± 541.032  ops/s
 
 #### async touch + netty thread
+49356.579 ± 2873.035  ops/s
+ap 42919.061 ± 820.391  ops/s
+
+#### async touch + netty thread + transfer queue
+
+#### async touch + netty thread + micro-optimizations
 
 ## Infinispan 11.0.x
 #### sync touch
@@ -21,4 +25,6 @@ ap 89681.014 ± 1928.761  ops/s
 ## Infinispan 13.0.x - async touch branch
 #### sync touch
 
-#### async touch
+#### async touch (transfer queue default)
+42419.528 ± 332.612  ops/s
+ap 38709.498 ± 699.361  ops/s
