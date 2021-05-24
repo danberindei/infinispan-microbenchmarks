@@ -35,11 +35,11 @@ LOG_MAIN=1
 LOG_ASYNC=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
-INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
+#INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
 #INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2"
-#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 9.4.24.DevAsyncTouch2 13.0.0.DevAsyncTouch"
+INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 9.4.24.DevAsyncTouch3"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch3"
 
 WORK_DIR=$HOME/Work
@@ -61,8 +61,8 @@ FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="4.2.12.Final"
 
 #INFINISPAN_CONFIG="../config/infinispan-sync.xml"
-INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
-#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
+#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
+INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
 #INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"
 
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
