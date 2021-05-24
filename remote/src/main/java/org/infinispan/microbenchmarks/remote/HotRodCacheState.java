@@ -4,7 +4,7 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.Configuration;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
-import org.infinispan.commons.marshall.IdentityMarshaller;
+//import org.infinispan.commons.marshall.IdentityMarshaller;
 import org.infinispan.configuration.internal.PrivateGlobalConfigurationBuilder;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
@@ -67,7 +67,7 @@ public class HotRodCacheState {
       for (int i = 0; i < clusterSize; i++) {
          Configuration remoteConfiguration = new ConfigurationBuilder()
                  .addServer().host(host).port(basePort + 1)
-                 .marshaller(IdentityMarshaller.class)
+//                 .marshaller(IdentityMarshaller.class)
                  .build();
          remoteManagers[i] = new RemoteCacheManager(remoteConfiguration);
          replCaches[i] = remoteManagers[i].getCache(replCacheName);

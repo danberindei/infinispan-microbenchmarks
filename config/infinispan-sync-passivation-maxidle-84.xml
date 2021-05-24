@@ -24,6 +24,8 @@
                 <file-store fetch-state="true" max-entries="5000000" path="internet-session-filestore" preload="false" purge="true" relative-to="jboss.server.data.dir" shared="false"></file-store>
             </persistence>
             <eviction strategy="LRU" size="10000000"/>
+            <data-container key-equivalence="org.infinispan.commons.equivalence.AnyServerEquivalence"
+                            value-equivalence="org.infinispan.commons.equivalence.AnyServerEquivalence" />
         </distributed-cache>
         <replicated-cache mode="SYNC" name="repl-sync" remote-timeout="21000"  start="EAGER">
             <locking acquire-timeout="1000" concurrency-level="1000" isolation="READ_COMMITTED" striping="false"></locking>
@@ -33,6 +35,8 @@
                 <file-store fetch-state="true" max-entries="5000000" path="internet-session-filestore" preload="false" purge="true" relative-to="jboss.server.data.dir" shared="false"></file-store>
             </persistence>
             <eviction strategy="LRU" size="10000000"/>
+            <data-container key-equivalence="org.infinispan.commons.equivalence.AnyServerEquivalence"
+                            value-equivalence="org.infinispan.commons.equivalence.AnyServerEquivalence" />
         </replicated-cache>
     </cache-container>
 

@@ -18,9 +18,9 @@ FILL_RATIO=0.7
 WARMUP_SECONDS=50
 TEST_SECONDS=50
 
-PREFIX=HRDistRead-at ; TEST="HotRodDist.*testGet"
+#PREFIX=HRDistRead-nt ; TEST="HotRodDist.*testGet"
 #PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
-#PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
+PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
 #PREFIX=MDDistRead ; TEST="MemcachedDist.*testGet"
 #PREFIX=MDDistWrite ; TEST="MemcachedDist.*testPut"
 
@@ -35,11 +35,11 @@ LOG_MAIN=1
 LOG_ASYNC=1
 
 INFINISPAN_PREBUILT_VERSIONS=""
-#INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
+INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
 #INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
-INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2"
-INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 9.4.24.DevAsyncTouch2 13.0.0.DevAsyncTouch"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 9.4.24.DevAsyncTouch2 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch3"
 
 WORK_DIR=$HOME/Work
@@ -61,8 +61,8 @@ FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="4.2.12.Final"
 
 #INFINISPAN_CONFIG="../config/infinispan-sync.xml"
-#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
-INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
+INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
+#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
 #INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"
 
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
@@ -74,7 +74,7 @@ TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt
 
 ASYNC_PROFILER_PATH=/home/dan/Tools/async-profiler/build
 
-COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseG1GC -Djava.net.preferIPv4Stack=true"
+COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+HeapDumpOnOutOfMemoryError -XX:+UseG1GC -Djava.net.preferIPv4Stack=true"
 #COMMON_OPTS="-XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -Xmx4g -XX:+UseG1GC -Djava.net.preferIPv4Stack=true"
 COMMON_OPTS="$COMMON_OPTS -Dlog4j.configurationFile=file:///$WORK_DIR/infinispan-microbenchmarks/config/log4j2.xml -Dorg.jboss.logging.provider=log4j2"
 #COMMON_OPTS="-XX:MaxInlineLevel=20"  #inlining helps a bit the async interceptors
