@@ -18,9 +18,9 @@ FILL_RATIO=0.7
 WARMUP_SECONDS=50
 TEST_SECONDS=50
 
-#PREFIX=HRDistRead-nt ; TEST="HotRodDist.*testGet"
+PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
 #PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
-PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
+#PREFIX=HRDistWrite ; TEST="HotRodDist.*testPut"
 #PREFIX=MDDistRead ; TEST="MemcachedDist.*testGet"
 #PREFIX=MDDistWrite ; TEST="MemcachedDist.*testPut"
 
@@ -37,40 +37,36 @@ LOG_ASYNC=1
 INFINISPAN_PREBUILT_VERSIONS=""
 #INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
 #INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
-#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.21.Final 9.4.24.DevAsyncTouch 11.0.9.Final"
+#INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final"
+#INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch"
+#INFINISPAN_PREBUILT_VERSIONS="13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2"
-INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 9.4.24.DevAsyncTouch3"
-#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch3"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 9.4.24.DevAsyncTouch3"
+INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch3"
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
 #INFINISPAN_HOME=$WORK_DIR/jdg
 
-
 INFINISPAN_COMMITS=""
 #INFINISPAN_COMMITS="master"
-
-MAVEN_SETTINGS=$INFINISPAN_HOME/maven-settings.xml
-MAVEN_REPO=$(cat $MAVEN_SETTINGS | perl -ne 'if (/<localRepository>(.*)<\/localRepository>/) { print "$1\n" }' | sed "s%\${user.home}%$HOME%")
-if [ -z "$MAVEN_REPO" ]; then
-  MAVEN_REPO=~/.m2/repository
-fi
 
 FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="4.0.21.Final"
 #FORCE_JGROUPS_VERSION="4.2.12.Final"
 
-#INFINISPAN_CONFIG="../config/infinispan-sync.xml"
-#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"
-INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"
-#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"
+#INFINISPAN_CONFIG="../config/infinispan-sync.xml"; RUN_CONFIG="s"
+#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"; RUN_CONFIG="nt"
+INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"; RUN_CONFIG="at"
+#INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"; RUN_CONFIG="st"
 
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
 JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
-#JGROUPS_CONFIG="../config/udp-transfer-queue-94.xml"
+#JGROUPS_CONFIG="../config/udp-transfer-queue-94.xml"; RUN_CONFIG="$RUN_CONFIG-tq"
 
-TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt
-#TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt
+#TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt
+TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt
 
 ASYNC_PROFILER_PATH=/home/dan/Tools/async-profiler/build
 
@@ -88,7 +84,14 @@ JFR_PARENT_OPTIONS="-Djmh.jfr.stackdepth=128"
 ALT_JFR_OPTIONS="-XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128 -XX:StartFlightRecording=settings=profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 #ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128 -XX:StartFlightRecording=settings=../config/allocation_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
 #ALT_JFR_OPTIONS="-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:FlightRecorderOptions=stackdepth=128,dumponexitpath=. -XX:StartFlightRecording=settings=../config/exception_profile.jfc,delay=${WARMUP_SECONDS}s,dumponexit=true"
+
 #cpupower --cpu all frequency-info | grep "current policy" | grep "and 3.00 GHz" || exit 9
+
+MAVEN_SETTINGS=$INFINISPAN_HOME/maven-settings.xml
+MAVEN_REPO=$(cat $MAVEN_SETTINGS | perl -ne 'if (/<localRepository>(.*)<\/localRepository>/) { print "$1\n" }' | sed "s%\${user.home}%$HOME%")
+if [ -z "$MAVEN_REPO" ]; then
+  MAVEN_REPO=~/.m2/repository
+fi
 
 function run_java() {
 #  $TEST_JAVA_HOME/bin/java "$@"
@@ -117,7 +120,7 @@ PARAMS="-t $NUM_THREADS -w 5 -wi $((WARMUP_SECONDS / 5)) -r 5 -i $((TEST_SECONDS
 mvn -s $MAVEN_SETTINGS clean package -Dversion.infinispan=$INFINISPAN_VERSION -Dversion.jgroups=$JGROUPS_VERSION | tee build.log | tail -20
 exit_on_error mvn
 
-BASENAME=$PREFIX-$(date +%Y%m%d-%H%M)-${SUFFIX//[^a-zA-Z0-9-_.]/_}
+BASENAME=$PREFIX-$(date +%Y%m%d-%H%M)-${RUN_VERSION//[^a-zA-Z0-9-_.]/_}-$RUN_CONFIG
 log_version > $BASENAME.log
 echo Results will be in $BASENAME.log
 
@@ -205,7 +208,7 @@ tail -1 $BASENAME.log
 
 # main
 for COMMIT in $INFINISPAN_COMMITS; do
-  SUFFIX=$COMMIT
+  RUN_VERSION=$COMMIT
   BUILD_DIR=/tmp/build-infinispan-microbenchmarks
   rm -rf $BUILD_DIR
   git clone -s $INFINISPAN_HOME $BUILD_DIR
@@ -233,7 +236,7 @@ for COMMIT in $INFINISPAN_COMMITS; do
 done
 
 for INFINISPAN_VERSION in $INFINISPAN_PREBUILT_VERSIONS; do
-  SUFFIX=$INFINISPAN_VERSION
+  RUN_VERSION=$INFINISPAN_VERSION
   if [ -z $FORCE_JGROUPS_VERSION ]; then
     mvn -s $MAVEN_SETTINGS compile -Dversion.infinispan=$INFINISPAN_VERSION
     if [[ -d $MAVEN_REPO/org/infinispan/infinispan-build-configuration-parent/$INFINISPAN_VERSION ]]; then

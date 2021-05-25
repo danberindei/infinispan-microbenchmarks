@@ -7,9 +7,13 @@ ap 88883.420 ± 3441.551  ops/s
 
 ## Infinispan 9.4.x
 #### sync touch
+26286.183 ± 634.888  ops/s
+ap 23622.715 ± 386.442  ops/s
 
 ## Infinispan 9.4.x - async touch branch
 #### sync touch
+26142.822 ± 433.599  ops/s
+ap 23495.271 ± 1647.606  ops/s
 
 #### async touch
 39930.500 ± 2219.054  ops/s
@@ -27,6 +31,16 @@ at 40115.727 ± 1000.080  ops/s
 
 ## Infinispan 11.0.x
 #### sync touch
+31584.054 ± 2310.736  ops/s
+ap 24979.793 ± 602.764  ops/s
+29226.177 ± 2304.561  ops/s
+ap 24812.491 ± 429.841  ops/s
+
+#### async touch
+34534.951 ± 3371.033  ops/s
+ap 28635.806 ± 1082.574  ops/s
+11 46747.591 ± 432.412  ops/s
+11 ap 40544.412 ± 367.085  ops/s
 
 ## Infinispan 13.0.x - async touch branch
 #### sync touch
