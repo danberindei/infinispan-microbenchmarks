@@ -27,23 +27,27 @@ PREFIX=HRDistRead ; TEST="HotRodDist.*testGet"
 LOG_MAIN=0; LOG_HICCUP=0; LOG_PERFNORM=0; LOG_GC=0; LOG_JITWATCH=0; LOG_PERFASM=0; LOG_JFR=0; LOG_ASYNC=0
 LOG_MAIN=1
 #LOG_HICCUP=1
+#LOG_HICCUP=1
 #LOG_PERFNORM=1
 #LOG_GC=1
 #LOG_JITWATCH=1
 #LOG_PERFASM=1
 #LOG_JFR=1
-LOG_ASYNC=1
+LOG_ASYNC=1; ASYNC_EVENT=cpu
+#LOG_ASYNC=1; ASYNC_EVENT=alloc
 
 INFINISPAN_PREBUILT_VERSIONS=""
 #INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1"
 #INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.21.Final 9.4.24.DevAsyncTouch 11.0.9.Final"
 #INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final"
-#INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch"
-#INFINISPAN_PREBUILT_VERSIONS="13.0.0.DevAsyncTouch"
+INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch3"
+#INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch 11.0.12.DevAsyncTouch2 11.0.12.DevAsyncTouch3"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 11.0.12.DevAsyncTouch 13.0.0.DevAsyncTouch"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 11.0.12.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 9.4.24.DevAsyncTouch3"
-INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch3"
+#INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch3"
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
@@ -59,14 +63,15 @@ FORCE_JGROUPS_VERSION=""
 #INFINISPAN_CONFIG="../config/infinispan-sync.xml"; RUN_CONFIG="s"
 #INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-84.xml"; RUN_CONFIG="nt"
 INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.xml"; RUN_CONFIG="at"
+#INFINISPAN_CONFIG="../config/infinispan-sync-maxidle-asynctouch-94.xml"; RUN_CONFIG="at-np"
 #INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-94.xml"; RUN_CONFIG="st"
 
 #JGROUPS_CONFIG="default-configs/default-jgroups-tcp.xml"
 JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
 #JGROUPS_CONFIG="../config/udp-transfer-queue-94.xml"; RUN_CONFIG="$RUN_CONFIG-tq"
 
-#TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt
-TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt
+TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt; RUN_CONFIG="$RUN_CONFIG-8"
+#TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt; RUN_CONFIG="$RUN_CONFIG-11"
 
 ASYNC_PROFILER_PATH=/home/dan/Tools/async-profiler/build
 
@@ -192,9 +197,9 @@ fi
 # async-profiler
 if [ "$LOG_ASYNC" == "1" ] ; then
   echo Collecting async-profiler info
-  ASYNC_PROFILER_BASENAME=$BASENAME-async-profiler
+  ASYNC_PROFILER_BASENAME=$BASENAME-async-profiler$ASYNC_EVENT
 #  ASYNC_PROFILER_OPTIONS="-agentpath:${ASYNC_PROFILER_PATH}/libasyncProfiler.so=start,file=${ASYNC_PROFILER_BASENAME}.folded,collapsed,event=wall,exclude=epoll_wait,exclude=__pthread*,exclude=*__libc_recv*,exclude=__GI___poll"
-  ASYNC_PROFILER_OPTIONS="-agentpath:${ASYNC_PROFILER_PATH}/libasyncProfiler.so=start,file=${ASYNC_PROFILER_BASENAME}.folded,collapsed,event=cpu"
+  ASYNC_PROFILER_OPTIONS="-agentpath:${ASYNC_PROFILER_PATH}/libasyncProfiler.so=start,file=${ASYNC_PROFILER_BASENAME}.folded,collapsed,event=$ASYNC_EVENT"
   run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $ASYNC_PROFILER_OPTIONS" -f 1 "$TEST" $PARAMS | tee "$ASYNC_PROFILER_BASENAME.log"
 #  ASYNC_PROFILER_PARAMS="libPath=$ASYNC_PROFILER_PATH/libasyncProfiler.so;output=text;event=wall;verbose=true"
 #  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 "$TEST" $PARAMS -prof "async:$ASYNC_PROFILER_PARAMS" | tee "$ASYNC_PROFILER_BASENAME.log"
