@@ -41,7 +41,8 @@ INFINISPAN_PREBUILT_VERSIONS=""
 #INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final 9.4.21.Final 9.4.24.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.21.Final 9.4.24.DevAsyncTouch 11.0.9.Final"
 #INFINISPAN_PREBUILT_VERSIONS="11.0.9.Final"
-INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch3"
+#INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch3"
+INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch4"
 #INFINISPAN_PREBUILT_VERSIONS="11.0.12.DevAsyncTouch 11.0.12.DevAsyncTouch2 11.0.12.DevAsyncTouch3"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 11.0.12.DevAsyncTouch 13.0.0.DevAsyncTouch"
 #INFINISPAN_PREBUILT_VERSIONS="9.4.24.DevAsyncTouch2 11.0.12.DevAsyncTouch 13.0.0.DevAsyncTouch"
@@ -70,8 +71,8 @@ INFINISPAN_CONFIG="../config/infinispan-sync-passivation-maxidle-asynctouch-94.x
 JGROUPS_CONFIG="default-configs/default-jgroups-udp.xml"
 #JGROUPS_CONFIG="../config/udp-transfer-queue-94.xml"; RUN_CONFIG="$RUN_CONFIG-tq"
 
-TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt; RUN_CONFIG="$RUN_CONFIG-8"
-#TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt; RUN_CONFIG="$RUN_CONFIG-11"
+#TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/8.0.275.hs-adpt; RUN_CONFIG="$RUN_CONFIG-8"
+TEST_JAVA_HOME=/home/dan/.sdkman/candidates/java/11.0.10.hs-adpt; RUN_CONFIG="$RUN_CONFIG-11"
 
 ASYNC_PROFILER_PATH=/home/dan/Tools/async-profiler/build
 

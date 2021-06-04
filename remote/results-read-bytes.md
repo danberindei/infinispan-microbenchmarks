@@ -41,6 +41,8 @@ at 40115.727 ± 1000.080  ops/s
 ap 24979.793 ± 602.764  ops/s
 29226.177 ± 2304.561  ops/s
 ap 24812.491 ± 429.841  ops/s
+46649.533 ± 3886.732  ops/s
+ap 39514.864 ± 787.474  ops/s
 
 #### async touch
 34534.951 ± 3371.033  ops/s
@@ -53,6 +55,27 @@ ap 28635.806 ± 1082.574  ops/s
 11 54226.313 ± 2461.975  ops/s
 11 ap 35439.481 ± 2146.684  ops/s
 
+#### async touch + no passivation + micro-optimizations (DevAsyncTouch2)
+47331.081 ± 3984.030  ops/s
+ap 39834.361 ± 499.564  ops/s
+
+#### async touch + no passivation + micro-optimizations (DevAsyncTouch3)
+51456.829 ± 3906.190  ops/s
+ap 39768.617 ± 916.977  ops/s
+
+#### async touch + micro-optimizations + NBS (DevAsyncTouch3)
+53724.055 ± 1207.247  ops/s
+ap 37738.265 ± 793.968  ops/s
+11 49199.629 ± 1920.770  ops/s
+11 ap 35911.246 ± 3688.665  ops/s
+11 47952.881 ± 2805.064  ops/s
+11 ap 36378.001 ± 660.559  ops/s
+
+#### async touch + micro-optimizations + sync load (DevAsyncTouch4)
+11 51631.887 ± 622.188  ops/s
+11 ap 49815.160 ± 817.279  ops/s
+50116.821 ± 4512.418  ops/s
+ap 32466.987 ± 1657.081  ops/s
 
 ## Infinispan 13.0.x - async touch branch
 #### sync touch
