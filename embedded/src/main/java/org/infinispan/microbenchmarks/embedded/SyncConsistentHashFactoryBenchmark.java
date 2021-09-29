@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.infinispan.commons.hash.MurmurHash3;
 import org.infinispan.distribution.ch.ConsistentHash;
 import org.infinispan.distribution.ch.impl.SyncConsistentHashFactory;
 import org.infinispan.distribution.ch.impl.TopologyAwareSyncConsistentHashFactory;
@@ -81,12 +82,12 @@ public class SyncConsistentHashFactoryBenchmark {
 
         @Benchmark
         public ConsistentHash createConsistentHash() {
-            return factory.create(numOwners, numSegments, nodes, null);
+            return factory.create(MurmurHash3.getInstance(), numOwners, numSegments, nodes, null);
         }
 
         @Benchmark
         public ConsistentHash createTopologyAwareConsistentHash() {
-            return topologyAwareFactory.create(numOwners, numSegments, nodes, null);
+            return topologyAwareFactory.create(MurmurHash3.getInstance(), numOwners, numSegments, nodes, null);
         }
     }
 
