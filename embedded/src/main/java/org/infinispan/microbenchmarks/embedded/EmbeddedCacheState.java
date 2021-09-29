@@ -1,9 +1,14 @@
 package org.infinispan.microbenchmarks.embedded;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.infinispan.Cache;
 import org.infinispan.configuration.parsing.ConfigurationBuilderHolder;
 import org.infinispan.configuration.parsing.ParserRegistry;
 import org.infinispan.context.Flag;
+import org.infinispan.distribution.LocalizedCacheTopology;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.remoting.transport.Address;
 import org.infinispan.remoting.transport.jgroups.JGroupsTransport;
@@ -15,13 +20,9 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 @State(Scope.Benchmark)
-public class DistCacheState {
-   private static final Log log = LogFactory.getLog(DistCacheState.class);
+public class EmbeddedCacheState {
+   private static final Log log = LogFactory.getLog(EmbeddedCacheState.class);
 
    @Param("4")
    int clusterSize;
@@ -29,44 +30,40 @@ public class DistCacheState {
    private String jgroupsConfig;
    @Param("missing")
    private String infinispanConfig;
-   private String cacheName = "dist-sync";
+   private String replCacheName = "repl-sync";
+   private String distCacheName = "dist-sync";
 
    DefaultCacheManager[] managers;
-   Cache[] caches;
-   Cache[] writeCaches;
-   Map<Address, Cache> cachesMap;
-   Map<Address, Cache> writeCachesMap;
-
+   Cache[] replCaches;
+   Cache[] distCaches;
+   Map<Address, Cache> distCacheMap;
 
    @Setup
    public void setup(KeySource keySource) throws IOException {
+      System.setProperty("jgroups.stack.file", jgroupsConfig);
       Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
          log.fatalf(e, "(%s:) Unhandled exception", t);
       });
       managers = new DefaultCacheManager[clusterSize];
-      caches = new Cache[clusterSize];
-      writeCaches = new Cache[clusterSize];
-      cachesMap = new HashMap<>();
-      writeCachesMap = new HashMap<>();
+      distCaches = new Cache[clusterSize];
+      replCaches = new Cache[clusterSize];
+      distCacheMap = new HashMap<>();
       for (int i = 0; i < clusterSize; i++) {
          ConfigurationBuilderHolder holder = new ParserRegistry().parseFile(infinispanConfig);
-         String nodeName = "Node" + (char) ('A' + i);
          holder.getGlobalConfigurationBuilder().transport()
-               .nodeName(nodeName)
+               .nodeName("Node" + (char) ('A' + i))
                .addProperty(JGroupsTransport.CONFIGURATION_FILE, jgroupsConfig);
-         log.infof("Starting node %s", nodeName);
          managers[i] = new DefaultCacheManager(holder, true);
-         caches[i] = managers[i].getCache(cacheName);
-         writeCaches[i] = caches[i].getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
-         cachesMap.put(managers[i].getAddress(), caches[i]);
-         writeCachesMap.put(managers[i].getAddress(), writeCaches[i]);
-         log.infof("Started node %s", managers[i].getAddress());
+         replCaches[i] = managers[i].getCache(replCacheName).getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
+         distCaches[i] = managers[i].getCache(distCacheName).getAdvancedCache().withFlags(Flag.IGNORE_RETURN_VALUES);
+         distCacheMap.put(managers[i].getAddress(), distCaches[i]);
       }
 
 //      System.out.println("Running with Infinispan " + Version.getVersion() + ", " + org.jgroups.Version.printDescription());
       System.out.println("Running with " + org.jgroups.Version.printDescription());
-      log.infof("Started cluster with CH %s", caches[0].getAdvancedCache().getDistributionManager().getConsistentHash());
-      keySource.populateCache((key, value) -> caches[0].put(key, value));
+      log.infof("Started cluster with CH %s", replCaches[0].getAdvancedCache().getDistributionManager().getCacheTopology().getReadConsistentHash());
+      keySource.populateCache((key, value) -> replCaches[0].put(key, value));
+      keySource.populateCache((key, value) -> distCaches[0].put(key, value));
    }
 
    @TearDown
@@ -76,19 +73,16 @@ public class DistCacheState {
       }
    }
 
-   public Cache getCache(long threadId) {
-      return caches[(int) (threadId % clusterSize)];
+   public Cache getReplCache(long threadId) {
+      return replCaches[(int) (threadId % clusterSize)];
+   }
+
+   public Cache getDistCache(long threadId) {
+      return distCaches[(int) (threadId % clusterSize)];
    }
 
    public Cache getPrimaryCache(Object key) {
-      return cachesMap.get(caches[0].getAdvancedCache().getDistributionManager().getPrimaryLocation(key));
-   }
-
-   public Cache getWriteCache(long threadId) {
-      return writeCaches[(int) (threadId % clusterSize)];
-   }
-
-   public Cache getPrimaryWriteCache(Object key) {
-      return writeCachesMap.get(caches[0].getAdvancedCache().getDistributionManager().getPrimaryLocation(key));
+      LocalizedCacheTopology cacheTopology = distCaches[0].getAdvancedCache().getDistributionManager().getCacheTopology();
+      return distCacheMap.get(cacheTopology.getDistribution(key).primary());
    }
 }

@@ -15,14 +15,14 @@ import java.util.concurrent.TimeUnit;
 public class PrimaryDistCacheBenchmark {
 
    @Benchmark
-   public Object testGet(Blackhole blackhole, DistCacheState state, KeySource keySource) {
+   public Object testGet(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource) {
       String key = keySource.nextKey();
       return state.getPrimaryCache(key).get(key);
    }
 
    @Benchmark
-   public Object testPut(Blackhole blackhole, DistCacheState state, KeySource keySource) {
+   public Object testPut(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource) {
       String key = keySource.nextKey();
-      return state.getPrimaryWriteCache(key).put(key, keySource.nextValue());
+      return state.getPrimaryCache(key).put(key, keySource.nextValue());
    }
 }

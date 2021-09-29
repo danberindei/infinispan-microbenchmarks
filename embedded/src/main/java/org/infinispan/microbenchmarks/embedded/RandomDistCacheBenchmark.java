@@ -26,21 +26,21 @@ import java.util.concurrent.TimeUnit;
 public class RandomDistCacheBenchmark {
 
    @Benchmark
-   public Object testGet(Blackhole blackhole, DistCacheState state, KeySource keySource) {
-      return state.getCache(Thread.currentThread().getId()).get(keySource.nextKey());
+   public Object testGet(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource) {
+      return state.getDistCache(Thread.currentThread().getId()).get(keySource.nextKey());
    }
 
    @Benchmark
-   public Object testPut(Blackhole blackhole, DistCacheState state, KeySource keySource) {
-      return state.getWriteCache(Thread.currentThread().getId()).put(keySource.nextKey(), keySource.nextValue());
+   public Object testPut(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource) {
+      return state.getDistCache(Thread.currentThread().getId()).put(keySource.nextKey(), keySource.nextValue());
    }
 
 
    @Benchmark
-   public void testTxGet(Blackhole blackhole, DistCacheState state, KeySource keySource)
+   public void testTxGet(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource)
          throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException,
          RollbackException {
-      Cache cache = state.getCache(Thread.currentThread().getId());
+      Cache cache = state.getDistCache(Thread.currentThread().getId());
       cache.getAdvancedCache().getTransactionManager().begin();
       try {
          blackhole.consume(cache.get(keySource.nextKey()));
@@ -50,10 +50,10 @@ public class RandomDistCacheBenchmark {
    }
 
    @Benchmark
-   public void testTxPut(Blackhole blackhole, DistCacheState state, KeySource keySource)
+   public void testTxPut(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource)
          throws SystemException, NotSupportedException, HeuristicRollbackException, HeuristicMixedException,
          RollbackException {
-      Cache cache = state.getWriteCache(Thread.currentThread().getId());
+      Cache cache = state.getDistCache(Thread.currentThread().getId());
       cache.getAdvancedCache().getTransactionManager().begin();
       try {
          blackhole.consume(cache.put(keySource.nextKey(), keySource.nextValue()));

@@ -21,19 +21,19 @@ import org.openjdk.jmh.runner.options.TimeValue;
 public class ReplCacheBenchmark {
 
    @Benchmark
-   public Object testGet(Blackhole blackhole, ReplCacheState state, KeySource keySource) {
-      return state.getCache(Thread.currentThread().getId()).get(keySource.nextKey());
+   public Object testGet(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource) {
+      return state.getReplCache(Thread.currentThread().getId()).get(keySource.nextKey());
    }
 
    @Benchmark
-   public Object testPut(Blackhole blackhole, ReplCacheState state, KeySource keySource) {
-      return state.getCache(Thread.currentThread().getId()).put(keySource.nextKey(), keySource.nextValue());
+   public Object testPut(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource) {
+      return state.getReplCache(Thread.currentThread().getId()).put(keySource.nextKey(), keySource.nextValue());
    }
 
    @Benchmark
-   public void testTxGet(Blackhole blackhole, ReplCacheState state, KeySource keySource)
+   public void testTxGet(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource)
          throws Exception {
-      Cache cache = state.getCache(Thread.currentThread().getId());
+      Cache cache = state.getReplCache(Thread.currentThread().getId());
       cache.getAdvancedCache().getTransactionManager().begin();
       try {
          blackhole.consume(cache.get(keySource.nextKey()));
@@ -43,9 +43,9 @@ public class ReplCacheBenchmark {
    }
 
    @Benchmark
-   public void testTxPut(Blackhole blackhole, ReplCacheState state, KeySource keySource)
+   public void testTxPut(Blackhole blackhole, EmbeddedCacheState state, KeySource keySource)
          throws Exception {
-      Cache cache = state.getCache(Thread.currentThread().getId());
+      Cache cache = state.getReplCache(Thread.currentThread().getId());
       cache.getAdvancedCache().getTransactionManager().begin();
       try {
          blackhole.consume(cache.put(keySource.nextKey(), keySource.nextValue()));
