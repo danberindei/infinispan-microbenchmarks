@@ -196,11 +196,14 @@ if [ "$LOG_ASYNC" == "1" ] ; then
   echo Collecting async-profiler info
   ASYNC_PROFILER_BASENAME=$BASENAME-async-profiler$ASYNC_EVENT
 #  ASYNC_PROFILER_OPTIONS="-agentpath:${ASYNC_PROFILER_PATH}/libasyncProfiler.so=start,file=${ASYNC_PROFILER_BASENAME}.folded,collapsed,event=wall,exclude=epoll_wait,exclude=__pthread*,exclude=*__libc_recv*,exclude=__GI___poll"
-  ASYNC_PROFILER_OPTIONS="-agentpath:${ASYNC_PROFILER_PATH}/libasyncProfiler.so=start,file=${ASYNC_PROFILER_BASENAME}.folded,collapsed,event=$ASYNC_EVENT"
-  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $ASYNC_PROFILER_OPTIONS" -f 1 "$TEST" $PARAMS | tee "$ASYNC_PROFILER_BASENAME.log"
-#  ASYNC_PROFILER_PARAMS="libPath=$ASYNC_PROFILER_PATH/libasyncProfiler.so;output=text;event=wall;verbose=true"
-#  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 "$TEST" $PARAMS -prof "async:$ASYNC_PROFILER_PARAMS" | tee "$ASYNC_PROFILER_BASENAME.log"
+#  ASYNC_PROFILER_OPTIONS="-agentpath:${ASYNC_PROFILER_PATH}/libasyncProfiler.so=start,file=${ASYNC_PROFILER_BASENAME}.folded,collapsed,event=$ASYNC_EVENT"
+#  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $ASYNC_PROFILER_OPTIONS" -f 1 "$TEST" $PARAMS | tee "$ASYNC_PROFILER_BASENAME.log"
+#  ASYNC_PROFILER_PARAMS="libPath=$ASYNC_PROFILER_PATH/libasyncProfiler.so;output=collapsed;event=$ASYNC_EVENT;verbose=true;file=${ASYNC_PROFILER_BASENAME}.folded"
+  ASYNC_PROFILER_PARAMS="libPath=$ASYNC_PROFILER_PATH/libasyncProfiler.so;output=collapsed;event=$ASYNC_EVENT;verbose=true"
+  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS" -f 1 "$TEST" $PARAMS -prof "async:$ASYNC_PROFILER_PARAMS" | tee "$ASYNC_PROFILER_BASENAME.log"
   log_version >> "$ASYNC_PROFILER_BASENAME.log"
+  mv "$(ls -t org.infinispan.microbenchmarks.embedded*/collapsed-*.csv | head -1)" "${ASYNC_PROFILER_BASENAME}.folded"
+  rmdir org.infinispan.microbenchmarks.embedded*
   java -cp ${ASYNC_PROFILER_PATH}/converter.jar FlameGraph "${ASYNC_PROFILER_BASENAME}.folded" "${ASYNC_PROFILER_BASENAME}.html"
 fi
 
