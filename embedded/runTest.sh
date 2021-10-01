@@ -15,8 +15,9 @@ KEY_SIZE=20
 VALUE_SIZE=1000
 NUM_KEYS=100000
 FILL_RATIO=0.7
-WARMUP_SECONDS=50
-TEST_SECONDS=50
+WARMUP_SECONDS=20
+TEST_SECONDS=40
+MAIN_FORK_COUNT=3
 
 #PREFIX=All ; TEST=".*CacheBenchmark.*"
 #PREFIX=NonTxRead ; TEST="(Local|Repl|RandomDist).*testGet"
@@ -49,13 +50,16 @@ LOG_ASYNC=1; ASYNC_EVENT=cpu
 
 INFINISPAN_PREBUILT_VERSIONS=""
 #INFINISPAN_PREBUILT_VERSIONS="8.4.2.Final-redhat-1 9.4.21.Final 11.0.9.Final"
+INFINISPAN_PREBUILT_VERSIONS="9.4.21.Final 11.0.9.Final 12.1.7.Final"
+#INFINISPAN_PREBUILT_VERSIONS="12.1.7.Final"
 
 WORK_DIR=$HOME/Work
 INFINISPAN_HOME=$WORK_DIR/infinispan
 #INFINISPAN_HOME=$WORK_DIR/jdg
 
 INFINISPAN_COMMITS=""
-INFINISPAN_COMMITS="main"
+#INFINISPAN_COMMITS="main"
+INFINISPAN_COMMITS="main ISPN-12611_repl_tx_read_regression"
 
 FORCE_JGROUPS_VERSION=""
 #FORCE_JGROUPS_VERSION="4.0.21.Final"
@@ -117,7 +121,7 @@ function exit_on_error() {
 }
 
 function run_build() {
-PARAMS="-t $NUM_THREADS -w 5 -wi $((WARMUP_SECONDS / 5)) -r 5 -i $((TEST_SECONDS / 5)) -bm $BENCHMARK_MODE -tu $BENCHMARK_TIME_UNITS -p infinispanConfig=$INFINISPAN_CONFIG -p jgroupsConfig=$JGROUPS_CONFIG -p clusterSize=$CLUSTER_SIZE -p initialFillRatio=$FILL_RATIO -p numKeys=${NUM_KEYS} -p keySize=${KEY_SIZE} -p valueSize=${VALUE_SIZE}"
+PARAMS="-t $NUM_THREADS -w 10 -wi $((WARMUP_SECONDS / 10)) -r 10 -i $((TEST_SECONDS / 10)) -bm $BENCHMARK_MODE -tu $BENCHMARK_TIME_UNITS -p infinispanConfig=$INFINISPAN_CONFIG -p jgroupsConfig=$JGROUPS_CONFIG -p clusterSize=$CLUSTER_SIZE -p initialFillRatio=$FILL_RATIO -p numKeys=${NUM_KEYS} -p keySize=${KEY_SIZE} -p valueSize=${VALUE_SIZE}"
 
 mvn -s $MAVEN_SETTINGS clean package -Dversion.infinispan=$INFINISPAN_VERSION -Dversion.jgroups=$JGROUPS_VERSION | tee build.log | tail -20
 exit_on_error mvn
@@ -128,7 +132,7 @@ echo Results will be in $BASENAME.log
 
 # straight results
 if [ "$LOG_MAIN" == "1" ] ; then
-  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $THROUGHPUT_OPTS" -f 3 "$TEST" $PARAMS >>$BASENAME.log
+  run_java -jar target/benchmarks.jar -jvmArgsPrepend "$COMMON_OPTS $THROUGHPUT_OPTS" -f $MAIN_FORK_COUNT "$TEST" $PARAMS >>$BASENAME.log
   log_version >> $BASENAME.log
 fi
 
