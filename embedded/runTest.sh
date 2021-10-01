@@ -220,7 +220,7 @@ for COMMIT in $INFINISPAN_COMMITS; do
   pushd $BUILD_DIR
   git checkout $COMMIT
   mvn clean
-  mvn install -DskipTests -am -pl core
+  mvn install -DskipTests -am -pl client/hotrod-client
   INFINISPAN_VERSION=$(cat core/pom.xml | perl -ne 'if (/<version>(.*)<\/version>/) { print "$1\n" }' | head -1)
   if [ -z $FORCE_JGROUPS_VERSION ]; then
     if [[ -d build-configuration ]]; then
